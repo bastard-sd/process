@@ -1,0 +1,23 @@
+{
+    "tagger_config":{
+        "tag_threshold": 0.35,
+        "character_threshold": 0.85
+    },
+    "llava_config":{
+        "template_internal":
+        {
+            "chain_of_thought": "Apply Zero-Shot Learning to interpret the image, prioritizing the 'Concept Focus'. Use Contrastive Prompting to refine analysis, emphasizing how the concept is represented",
+            "concept_focus": "Explain how the 'Concept Focus' is manifested in the image, integrating this throughout your analysis",
+            "subject_age": "Estimate age for prominent subjects in this format: X years old",
+            "subject_face_and_body": "Describe facial features and body language",
+            "subject_emotion": "Identify the most prominent emotion",
+            "subject_clothing": "Detail clothing",
+            "subject_pose": "Summarize the pose",
+            "subject_activity": "Describe the action",
+            "style_detail": "Select art styles that match the image",
+            "technical_detail": "Summarize technical aspects and narrative contribution",
+            "relevant_tags": ["most prominent and relevant concept words", "one phrase per string"]
+        },
+        "concept_focus":""
+    }
+}

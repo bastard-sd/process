@@ -1,0 +1,14 @@
+colour
+demjson3
+Flask
+inflect
+numpy
+onnxruntime_gpu
+onnxruntime
+openai
+opencv_python
+opencv_python_headless
+pandas
+Pillow
+Requests
+spacy
