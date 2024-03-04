@@ -63,12 +63,11 @@ def load_image(image_path, error_directory):
         image = Image.open(image_path)  # Load the image using PIL
         img = np.array(image, np.uint8)  # Attempt the conversion to numpy array
     except OSError as e:
-        if "image file is truncated" in str(e):  # Check for specific error message
-            print(f"Error: {image_path} is truncated. Moving to error directory.")
-            if not os.path.exists(error_directory):  # Create error directory if it doesn't exist
-                os.makedirs(error_directory)
-            shutil.move(image_path, os.path.join(error_directory, os.path.basename(image_path)))  # Move the erroneous image
-            return None
+        print(f"Error: {e}. Moving to error directory.")
+        if not os.path.exists(error_directory):  # Create error directory if it doesn't exist
+            os.makedirs(error_directory)
+        shutil.move(image_path, os.path.join(error_directory, os.path.basename(image_path)))  # Move the erroneous image
+        return None
     return img
 
 def validate_images_imagemagick(image_directory, error_directory):
