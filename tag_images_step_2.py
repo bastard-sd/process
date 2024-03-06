@@ -156,146 +156,148 @@ with open(r".\\prompts\\system_prompt_COT.txt", 'r', encoding='utf-8') as file:
     system_prompt = file.read()
 chat_prompt = 'Describe this image using your template AND all of the system prompt instructions.'
 
-template_file = os.path.join(args.image_directory, 'template.json')
-with open(template_file, 'r', encoding='utf-8') as file:
-    template_data = json.load(file)
-    config = template_data
+for dirpath, dirnames, filenames in os.walk(args.image_directory):
+    for filename in filenames:
+        if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.bmp', '.gif', '.tiff', '.webp', '.webm')):
 
-for filename in os.listdir(args.image_directory):
-    if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.bmp', '.gif', '.tiff', '.webp', '.webm')):
-        image_path = os.path.join(args.image_directory, filename)
-        with open(os.path.join(args.image_directory, os.path.splitext(filename)[0]+'.json'), 'r', encoding='utf-8') as file:
-            combined_results = json.load(file)
+            template_file = os.path.join(dirpath, 'template.json')
+            with open(template_file, 'r', encoding='utf-8') as file:
+                template_data = json.load(file)
+                config = template_data
 
-        # Check if 'caption' exists and is neither None nor an empty string
-        if combined_results.get('caption'):
-            continue
-        
-        template_internal = config['llava_config']['template_internal']
-        template_blank = {key: '' for key in config['llava_config']['template_internal']}
-        concept_focus = config['llava_config']['concept_focus']
-        template = 'OUTPUT_TEMPLATE_WITH_INTERNAL_INSTRUCTIONS: ' + json.dumps(template_internal) + ' OUTPUT_TEMPLATE: ' + json.dumps(template_blank) + ' CONCEPT_FOCUS: ' + concept_focus + ' CAPTION_FILE: ' + combined_results['processed']
-        
-        path = image_path
-        base64_image = ""
-        try:
-            image = open(path.replace("'", ""), "rb").read()
-            base64_image = base64.b64encode(image).decode("utf-8")
-        except:
-            print("Couldn't read the image. Make sure the path is correct and the file exists.")
-            continue
+            image_path = os.path.join(dirpath, filename)
+            with open(os.path.join(dirpath, os.path.splitext(filename)[0]+'.json'), 'r', encoding='utf-8') as file:
+                combined_results = json.load(file)
 
-        try_again = True
-        temp_modifier = 0.0
-        while try_again:
-            completion = client.chat.completions.create(
-                model="local-model", # not used
-                messages=[
-                {
-                    "role": "system",
-                    "content": system_prompt + template,
-                },
-                {
-                    "role": "user",
-                    "content": [
-                    {"type": "text", "text": chat_prompt},
+            # Check if 'caption' exists and is neither None nor an empty string
+            if combined_results.get('caption'):
+                continue
+            
+            template_internal = config['llava_config']['template_internal']
+            template_blank = {key: '' for key in config['llava_config']['template_internal']}
+            concept_focus = config['llava_config']['concept_focus']
+            template = 'OUTPUT_TEMPLATE_WITH_INTERNAL_INSTRUCTIONS: ' + json.dumps(template_internal) + ' OUTPUT_TEMPLATE: ' + json.dumps(template_blank) + ' CONCEPT_FOCUS: ' + concept_focus + ' CAPTION_FILE: ' + combined_results['processed']
+            
+            path = image_path
+            base64_image = ""
+            try:
+                image = open(path.replace("'", ""), "rb").read()
+                base64_image = base64.b64encode(image).decode("utf-8")
+            except:
+                print("Couldn't read the image. Make sure the path is correct and the file exists.")
+                continue
+
+            try_again = True
+            temp_modifier = 0.0
+            while try_again:
+                completion = client.chat.completions.create(
+                    model="local-model", # not used
+                    messages=[
                     {
-                        "type": "image_url",
-                        "image_url": {
-                        "url": f"data:image/jpeg;base64,{base64_image}"
-                        },
+                        "role": "system",
+                        "content": system_prompt + template,
                     },
+                    {
+                        "role": "user",
+                        "content": [
+                        {"type": "text", "text": chat_prompt},
+                        {
+                            "type": "image_url",
+                            "image_url": {
+                            "url": f"data:image/jpeg;base64,{base64_image}"
+                            },
+                        },
+                        ],
+                    }
                     ],
-                }
-                ],
-                max_tokens=32000,
-                stream=False,
-                temperature=0.2 + temp_modifier,
-                presence_penalty=1.1,
-                top_p=0.95
-            )
+                    max_tokens=32000,
+                    stream=False,
+                    temperature=0.2 + temp_modifier,
+                    presence_penalty=1.1,
+                    top_p=0.95
+                )
 
-            # content = completion.choices[0].message.content
-            # returned_json = json.loads(content)
+                # content = completion.choices[0].message.content
+                # returned_json = json.loads(content)
 
-            returned_json = None
-            for choice in completion.choices:
-                try:
-                    # Attempt to parse the JSON content
-                    content = choice.message.content.replace("\n", "")
-                    returned_json = json.loads(content)
-                    # If the above line does not raise an error, break out of the loop
-                    break
-                except json.JSONDecodeError:
+                returned_json = None
+                for choice in completion.choices:
                     try:
                         # Attempt to parse the JSON content
-                        returned_json = demjson3.decode(content)
+                        content = choice.message.content.replace("\n", "")
+                        returned_json = json.loads(content)
                         # If the above line does not raise an error, break out of the loop
                         break
-                    except demjson3.JSONDecodeError as e:
-                        print(f"Error parsing JSON: {e}")
-                        continue
+                    except json.JSONDecodeError:
+                        try:
+                            # Attempt to parse the JSON content
+                            returned_json = demjson3.decode(content)
+                            # If the above line does not raise an error, break out of the loop
+                            break
+                        except demjson3.JSONDecodeError as e:
+                            print(f"Error parsing JSON: {e}")
+                            continue
 
-            # Check if we successfully parsed any JSON
-            if returned_json:
-                print("Successfully parsed JSON:", returned_json)
-                try_again = False
-            temp_modifier += 0.01
-        
-        combined_results['llm'] = returned_json
-        cot_substrings = ["chain", "of", "thought"]
-        # Iterate over a list of keys (to avoid RuntimeError for changing dict size during iteration)
-        for key in list(returned_json.keys()):
-            # Check if all substrings are present in the key, ignoring non-alphanumeric characters in the key
-            if all(sub in ''.join(filter(str.isalnum, key)).lower() for sub in cot_substrings):
-                # If found, pop the key and break, assuming only one such key needs to be removed
-                returned_json.pop(key)
-                break
+                # Check if we successfully parsed any JSON
+                if returned_json:
+                    print("Successfully parsed JSON:", returned_json)
+                    try_again = False
+                temp_modifier += 0.01
             
-        conceptfocus_substrings = ["concept", "focus"]
-        # Iterate over a list of keys (to avoid RuntimeError for changing dict size during iteration)
-        for key in list(returned_json.keys()):
-            # Check if all substrings are present in the key, ignoring non-alphanumeric characters in the key
-            if all(sub in ''.join(filter(str.isalnum, key)).lower() for sub in conceptfocus_substrings):
-                # If found, pop the key and break, assuming only one such key needs to be removed
-                returned_json.pop(key)
-                break
-        
-        relevant_tags = returned_json.pop('relevant_tags')
-        
-        # Part 1: Process the dictionary and concatenate values
-        concatenated_values = ', '.join([
-            ', '.join([subvalue.replace('.', ',').strip() for subvalue in value]) if isinstance(value, list) 
-            else value.replace('.', ',').strip()
-            for value in returned_json.values()
-        ])
-
-        # Part 2: Process the comma delimited string, compare, and append if necessary
-        # Convert the comma delimited string into a list
-        comma_delimited_list = combined_results['processed'].split(',')
-        comma_delimited_list = [value.replace('.', '').strip() for value in comma_delimited_list]
-        relevant_tags = [value.replace('.', '').strip() for value in relevant_tags]
-        combined_set = set(comma_delimited_list + relevant_tags)
-        comma_delimited_list = list(combined_set)
-
-        # Trim whitespace and check if each element is not in the concatenated string
-        elements_not_in_concatenated = [element.strip() for element in comma_delimited_list if element.strip() not in concatenated_values]
-
-        # If there are elements not in the concatenated string, append them
-        if elements_not_in_concatenated:
-            if concatenated_values:  # Check if concatenated_values is not empty
-                concatenated_values += ', '  # Add a separator before appending new elements
-            concatenated_values += ', '.join(elements_not_in_concatenated)
+            combined_results['llm'] = returned_json
+            cot_substrings = ["chain", "of", "thought"]
+            # Iterate over a list of keys (to avoid RuntimeError for changing dict size during iteration)
+            for key in list(returned_json.keys()):
+                # Check if all substrings are present in the key, ignoring non-alphanumeric characters in the key
+                if all(sub in ''.join(filter(str.isalnum, key)).lower() for sub in cot_substrings):
+                    # If found, pop the key and break, assuming only one such key needs to be removed
+                    returned_json.pop(key)
+                    break
+                
+            conceptfocus_substrings = ["concept", "focus"]
+            # Iterate over a list of keys (to avoid RuntimeError for changing dict size during iteration)
+            for key in list(returned_json.keys()):
+                # Check if all substrings are present in the key, ignoring non-alphanumeric characters in the key
+                if all(sub in ''.join(filter(str.isalnum, key)).lower() for sub in conceptfocus_substrings):
+                    # If found, pop the key and break, assuming only one such key needs to be removed
+                    returned_json.pop(key)
+                    break
             
-        # 'concatenated_values' now contains all substrings processed as per the instructions
-        combined_results['caption'] = concatenated_values
+            relevant_tags = returned_json.pop('relevant_tags')
+            
+            # Part 1: Process the dictionary and concatenate values
+            concatenated_values = ', '.join([
+                ', '.join([subvalue.replace('.', ',').strip() for subvalue in value]) if isinstance(value, list) 
+                else value.replace('.', ',').strip()
+                for value in returned_json.values()
+            ])
 
-        json_path = os.path.splitext(image_path)[0] + '.json'
-        with open(json_path, 'w') as json_file:
-            json.dump(combined_results, json_file, cls=NumpyEncoder, indent=4)
-            
-        txt_path = os.path.splitext(image_path)[0] + '.txt'
-        with open(txt_path, 'w', encoding='utf-8') as txt_file:
-            txt_file.write(concatenated_values)
-            
-        print(f"Saved combined results to {json_path} and {txt_path}.")
+            # Part 2: Process the comma delimited string, compare, and append if necessary
+            # Convert the comma delimited string into a list
+            comma_delimited_list = combined_results['processed'].split(',')
+            comma_delimited_list = [value.replace('.', '').strip() for value in comma_delimited_list]
+            relevant_tags = [value.replace('.', '').strip() for value in relevant_tags]
+            combined_set = set(comma_delimited_list + relevant_tags)
+            comma_delimited_list = list(combined_set)
+
+            # Trim whitespace and check if each element is not in the concatenated string
+            elements_not_in_concatenated = [element.strip() for element in comma_delimited_list if element.strip() not in concatenated_values]
+
+            # If there are elements not in the concatenated string, append them
+            if elements_not_in_concatenated:
+                if concatenated_values:  # Check if concatenated_values is not empty
+                    concatenated_values += ', '  # Add a separator before appending new elements
+                concatenated_values += ', '.join(elements_not_in_concatenated)
+                
+            # 'concatenated_values' now contains all substrings processed as per the instructions
+            combined_results['caption'] = concatenated_values
+
+            json_path = os.path.splitext(image_path)[0] + '.json'
+            with open(json_path, 'w') as json_file:
+                json.dump(combined_results, json_file, cls=NumpyEncoder, indent=4)
+                
+            txt_path = os.path.splitext(image_path)[0] + '.txt'
+            with open(txt_path, 'w', encoding='utf-8') as txt_file:
+                txt_file.write(concatenated_values)
+                
+            print(f"Saved combined results to {json_path} and {txt_path}.")
