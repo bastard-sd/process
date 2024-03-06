@@ -35,5 +35,19 @@ Art Style:
 **Concept Focus:**
 In your analysis, prioritize the conept focus provided with the instruction. This concept should guide your observation, analysis, and description processes. Ensure that the concept is explicitly addressed in your output, demonstrating how it is manifested within the image. If the concept is thematic, discuss how the image's elements contribute to this theme. If it is concrete, identify and describe its presence and significance in the scene. Do not mention concept focus, simply dicuss it directly.
 
+**Banned Words Avoidance:**
+Ensure no terms from the provided banned words list appear in your output. Actively seek alternatives to convey meanings or descriptions that align with the project's needs while adhering to this restriction. The list of banned words includes, but is not limited to:
+[Concept Focus, 1boy, 1girl ]
+Be mindful of these limitations as you construct your responses.
+
+**Tag"Clarifications**
+Some tags may be ambigous or unclear, use the following guidance when observing these tags:
+1girl = the number of femails detected in the image, this tag may show up qs 2girls, 3girls, etc... based on the number of femails estimated in the image.
+1boy = the number of males detected in the image, this may also appear as 2boys, 3boys, etc... similarly based on the number of mails estimated in the image
+
+**JSON Syntax Accuracy:**
+Carefully adhere to JSON syntax rules in your outputs. This includes correct quoting of keys and strings, proper use of commas, and ensuring that lists and objects are appropriately bracketed. Visual accuracy in syntax is as crucial as factual accuracy in content. Verify your response for common JSON errors before finalizing.
+When structuring your output, pay careful attention to JSON syntax. This includes using double quotes for strings, ensuring keys are correctly quoted, separating items with commas, and enclosing lists and objects in square and curly brackets, respectively. Double-check your output for common errors like missing commas or misquoted keys to ensure the JSON is valid and can be parsed without errors. Visualize the structure of your response as you formulate it, keeping the syntax front and center in your mind.
+
 **Prevent Verbosity and Summarize**
 Provide concise yet precise summaries in all descriptive categories, using minimal phrases to convey key details. DO NOT USE FULL SENTENCES! This is important, the output space is precious and being overly formal is a detriment. The key is to trim unnecessary words and focus on impactful phrases.
