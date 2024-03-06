@@ -7,6 +7,7 @@ import uuid
 import argparse
 import json
 from advcaption.taggers import ImageTagger
+import io
 
 # Adapted from OpenAI's Vision example 
 from openai import OpenAI
@@ -181,8 +182,20 @@ for dirpath, dirnames, filenames in os.walk(args.image_directory):
             path = image_path
             base64_image = ""
             try:
-                image = open(path.replace("'", ""), "rb").read()
-                base64_image = base64.b64encode(image).decode("utf-8")
+                if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.bmp', '.gif', '.tiff', '.webp', '.webm')):
+                        
+                    with Image.open(image_path) as img:
+                        # Convert the image to PNG by saving it to a bytes buffer
+                        # This avoids the need to save and read the file from disk
+                        buffer = io.BytesIO()
+                        img.save(buffer, format="PNG")
+                        
+                        # Seek to the beginning of the buffer
+                        buffer.seek(0)
+                        base64_image = base64.b64encode(buffer.read()).decode('utf-8')
+                else:
+                    image = open(path.replace("'", ""), "rb").read()
+                    base64_image = base64.b64encode(image).decode("utf-8")
             except:
                 print("Couldn't read the image. Make sure the path is correct and the file exists.")
                 continue
