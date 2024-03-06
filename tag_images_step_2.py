@@ -262,13 +262,28 @@ for dirpath, dirnames, filenames in os.walk(args.image_directory):
                     # If found, pop the key and break, assuming only one such key needs to be removed
                     returned_json.pop(key)
                     break
-
-            # Part 1: Process the dictionary and concatenate values
-            concatenated_values = ', '.join([
-                ', '.join([subvalue.replace('.', ',').strip() for subvalue in value]) if isinstance(value, list) 
-                else value.replace('.', ',').strip()
-                for value in returned_json.values()
-            ])
+            def process_value(value):
+                """
+                Recursively process the input value to handle strings, lists, and dictionaries.
+                Converts dictionaries to strings by concatenating their values, potentially leading to nested calls.
+                """
+                if isinstance(value, list):
+                    return ', '.join(process_value(subvalue) for subvalue in value)
+                elif isinstance(value, dict):
+                    # If the value is a dictionary, recursively process its values
+                    return ', '.join(process_value(subvalue) for subvalue in value.values())
+                else:
+                    # For strings or other types that can be directly converted to strings
+                    return value.replace('.', ',').strip()
+    
+            concatenated_values = ', '.join(process_value(value) for value in returned_json.values())
+            
+            # # Part 1: Process the dictionary and concatenate values
+            # concatenated_values = ', '.join([
+            #     ', '.join([subvalue.replace('.', ',').strip() for subvalue in value]) if isinstance(value, list) 
+            #     else value.replace('.', ',').strip()
+            #     for value in returned_json.values()
+            # ])
 
             # Part 2: Process the comma delimited string, compare, and append if necessary
             # Convert the comma delimited string into a list
