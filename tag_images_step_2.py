@@ -262,9 +262,7 @@ for dirpath, dirnames, filenames in os.walk(args.image_directory):
                     # If found, pop the key and break, assuming only one such key needs to be removed
                     returned_json.pop(key)
                     break
-            
-            relevant_tags = returned_json.pop('relevant_tags')
-            
+
             # Part 1: Process the dictionary and concatenate values
             concatenated_values = ', '.join([
                 ', '.join([subvalue.replace('.', ',').strip() for subvalue in value]) if isinstance(value, list) 
@@ -274,6 +272,9 @@ for dirpath, dirnames, filenames in os.walk(args.image_directory):
 
             # Part 2: Process the comma delimited string, compare, and append if necessary
             # Convert the comma delimited string into a list
+                        
+            relevant_tags = returned_json.get('relevant_tags', [])
+            
             comma_delimited_list = combined_results['processed'].split(',')
             comma_delimited_list = [value.replace('.', '').strip() for value in comma_delimited_list]
             relevant_tags = [value.replace('.', '').strip() for value in relevant_tags]
