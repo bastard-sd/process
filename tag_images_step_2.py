@@ -189,6 +189,7 @@ def generate_unique_id(length=8):
 parser = argparse.ArgumentParser(description="Process images in a directory.")
 parser.add_argument("--image_directory", help="The directory containing images to process.")
 parser.add_argument("--overwrite", action="store_true", help="Overwrite the LLM captions from a previous run.")
+parser.add_argument("--default_template", help="Choose the template file to use as your default.", default="template_boilerplate.json")
 parser.add_argument("--skipconcept", action="store_true", help="Skip adding a customized concept per subdirectory.")
 args = parser.parse_args()
 
@@ -200,7 +201,7 @@ for dirpath, dirnames, filenames in os.walk(args.image_directory):
     for filename in filenames:
         if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.bmp', '.gif', '.tiff', '.webp', '.webm')):
 
-            config = load_or_initialize_template(dirpath)
+            config = load_or_initialize_template(dirpath, args.default_template)
 
             image_path = os.path.join(dirpath, filename)
             with open(os.path.join(dirpath, os.path.splitext(filename)[0]+'.json'), 'r', encoding='utf-8') as file:
