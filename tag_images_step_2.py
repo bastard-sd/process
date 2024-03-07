@@ -18,6 +18,43 @@ import demjson3
 # Point to the local server
 client = OpenAI(base_url="http://localhost:1234/v1", api_key="not-needed")
 
+def load_or_initialize_template(dirpath, default_template_path='./template_boilerplate.json'):
+    """
+    Loads a template JSON file from the specified directory. If it doesn't exist,
+    copies a default template into the directory, updates its 'llava_config'->'concept_focus'
+    to the directory name, and returns the template data.
+
+    Parameters:
+    - dirpath: The directory path to check for the template file and potentially update with default template.
+    - default_template_path: Path to the default template file.
+    
+    Returns:
+    A dictionary representing the loaded or initialized template JSON data.
+    """
+    template_file = os.path.join(dirpath, 'template.json')
+
+    # Check if the specific template.json file exists in the directory
+    if not os.path.isfile(template_file):
+        print(f"'{template_file}' does not exist. Using default template instead.")
+        template_file = default_template_path
+    else:
+        print(f"Found '{template_file}'. Loading...")
+
+    # Load the template data from either the existing or the copied default template file
+    with open(template_file, 'r', encoding='utf-8') as file:
+        template_data = json.load(file)
+    
+    # Update 'concept_focus' with the directory's name
+    dir_name = os.path.basename(dirpath)  # Extracts the folder name
+    if 'llava_config' in template_data and 'concept_focus' in template_data['llava_config']:
+        template_data['llava_config']['concept_focus'] = dir_name
+    else:
+        print("Warning: 'llava_config' or 'concept_focus' key not found. Adding them.")
+        template_data.setdefault('llava_config', {})['concept_focus'] = dir_name
+
+    # Return the updated template data
+    return template_data
+
 
 class NumpyEncoder(json.JSONEncoder):
     """ Custom encoder for numpy data types """
@@ -151,6 +188,7 @@ def generate_unique_id(length=8):
 
 parser = argparse.ArgumentParser(description="Process images in a directory.")
 parser.add_argument("--image_directory", help="The directory containing images to process.")
+parser.add_argument("--overwrite", action="store_true", help="Overwrite the LLM captions from a previous run.")
 args = parser.parse_args()
 
 with open(r".\\prompts\\system_prompt_COT.txt", 'r', encoding='utf-8') as file:
@@ -161,17 +199,14 @@ for dirpath, dirnames, filenames in os.walk(args.image_directory):
     for filename in filenames:
         if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.bmp', '.gif', '.tiff', '.webp', '.webm')):
 
-            template_file = os.path.join(dirpath, 'template.json')
-            with open(template_file, 'r', encoding='utf-8') as file:
-                template_data = json.load(file)
-                config = template_data
+            config = load_or_initialize_template(dirpath)
 
             image_path = os.path.join(dirpath, filename)
             with open(os.path.join(dirpath, os.path.splitext(filename)[0]+'.json'), 'r', encoding='utf-8') as file:
                 combined_results = json.load(file)
 
             # Check if 'caption' exists and is neither None nor an empty string
-            if combined_results.get('caption'):
+            if combined_results.get('caption') and args.overwrite == False:
                 continue
             
             template_internal = config['llava_config']['template_internal']
