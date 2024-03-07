@@ -189,6 +189,7 @@ def generate_unique_id(length=8):
 parser = argparse.ArgumentParser(description="Process images in a directory.")
 parser.add_argument("--image_directory", help="The directory containing images to process.")
 parser.add_argument("--overwrite", action="store_true", help="Overwrite the LLM captions from a previous run.")
+parser.add_argument("--skipconcept", action="store_true", help="Skip adding a customized concept per subdirectory.")
 args = parser.parse_args()
 
 with open(r".\\prompts\\system_prompt_COT.txt", 'r', encoding='utf-8') as file:
@@ -211,8 +212,12 @@ for dirpath, dirnames, filenames in os.walk(args.image_directory):
             
             template_internal = config['llava_config']['template_internal']
             template_blank = {key: '' for key in config['llava_config']['template_internal']}
-            concept_focus = config['llava_config']['concept_focus']
-            template = 'OUTPUT_TEMPLATE_WITH_INTERNAL_INSTRUCTIONS: ' + json.dumps(template_internal) + ' OUTPUT_TEMPLATE: ' + json.dumps(template_blank) + ' CONCEPT_FOCUS: ' + concept_focus + ' CAPTION_FILE: ' + combined_results['processed']
+            
+            if args.skipconcept:
+                template = 'OUTPUT_TEMPLATE_WITH_INTERNAL_INSTRUCTIONS: ' + json.dumps(template_internal) + ' OUTPUT_TEMPLATE: ' + json.dumps(template_blank) + ' CAPTION_FILE: ' + combined_results['processed']
+            else:
+                concept_focus = config['llava_config']['concept_focus']
+                template = 'OUTPUT_TEMPLATE_WITH_INTERNAL_INSTRUCTIONS: ' + json.dumps(template_internal) + ' OUTPUT_TEMPLATE: ' + json.dumps(template_blank) + ' CONCEPT_FOCUS: ' + concept_focus + ' CAPTION_FILE: ' + combined_results['processed']
             
             path = image_path
             base64_image = ""
