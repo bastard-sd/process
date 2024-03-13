@@ -165,7 +165,7 @@ def is_this_a_color(color):
         return False
 
 def combine_root_and_phrases(nlp, ie, root, phrases):
-    if root == ' ':
+    if root == '':
         return
     prefixes = []
     suffixes = []
