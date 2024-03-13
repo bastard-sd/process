@@ -180,15 +180,23 @@ processor = ImageTagger(tag_threshold=tag_threshold, ratio_threshold=tag_thresho
 spacy_model = loadmodel("en_core_web_lg", 'cuda:0')
 inflect_model = loadinflectmodel()
 
+
 for filename in renamed_filelist:
     print(filename)
+    
+    # Check if a corresponding JSON file already exists
+    json_path = os.path.splitext(filename)[0] + '.json'
+    if os.path.exists(json_path):
+        print(f"JSON file already exists for {filename}. Skipping.")
+        continue
+    
+    # Proceed with processing the image if no JSON file exists
     if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.bmp', '.gif', '.tiff', '.webp', '.webm')):
         image_path = filename
         combined_results = processor.process_image(image_path)
         fully_processed_prompt = process_input_tags(spacy_model, inflect_model, [], combined_results['general'])
         combined_results['processed'] = fully_processed_prompt
 
-        json_path = os.path.splitext(image_path)[0] + '.json'
         with open(json_path, 'w') as json_file:
             json.dump(combined_results, json_file, cls=NumpyEncoder, indent=4)
         print(f"Saved combined results to {json_path}.")
