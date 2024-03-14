@@ -183,19 +183,27 @@ inflect_model = loadinflectmodel()
 
 for filename in renamed_filelist:
     print(filename)
-    
+
     # Check if a corresponding JSON file already exists
     json_path = os.path.splitext(filename)[0] + '.json'
     if os.path.exists(json_path):
         print(f"JSON file already exists for {filename}. Skipping.")
         continue
-    
+
     # Proceed with processing the image if no JSON file exists
     if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.bmp', '.gif', '.tiff', '.webp', '.webm')):
         image_path = filename
         combined_results = processor.process_image(image_path)
-        fully_processed_prompt = process_input_tags(spacy_model, inflect_model, [], combined_results['general'])
-        combined_results['processed'] = fully_processed_prompt
+        
+        try:
+            fully_processed_prompt = process_input_tags(spacy_model, inflect_model, [], combined_results['general'])
+            combined_results['processed'] = fully_processed_prompt
+        except Exception as e:
+            print(f"Error processing tags for {filename}: {e}. Skipping this step.")
+            print(f"Moving {filename} to error directory.")
+            shutil.move(image_path, os.path.join(args.error_directory, os.path.basename(filename)))
+            # Optionally, you can decide to continue, break, or take any specific action here
+            continue  # or use 'break' to stop the loop, or 'pass' to do nothing further
 
         with open(json_path, 'w') as json_file:
             json.dump(combined_results, json_file, cls=NumpyEncoder, indent=4)
