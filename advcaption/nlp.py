@@ -165,20 +165,31 @@ def is_this_a_color(color):
         return False
 
 def combine_root_and_phrases(nlp, ie, root, phrases):
-    if root == '':
-        return
+    # Ensure 'root' is not empty or only whitespace
+    if not root.strip():
+        # Early return or handle as needed; returning an empty string as a fallback
+        return ""
+
+    # Proceed with the original processing, now assured 'root' is not empty
     prefixes = []
     suffixes = []
     root_doc = nlp(root)
-    plural_root = ie.plural(root) if root_doc[0].tag_ != "NNS" else root
+
+    # Guarding the pluralization with a check
+    plural_root = root  # Default to root in case it's already plural or if checks fail
+    if root.strip() and root_doc and root_doc[0].tag_ != "NNS":
+        plural_root = ie.plural(root)
     
     use_plural = False
     for phrase in phrases:
         if str(plural_root) in str(phrase):
             use_plural = True
             break
+
     root_to_use = plural_root if use_plural else root
     modified_root = root_to_use
+
+    # Further processing continues from here...
     
     for phrase in phrases:
         if 'see-through' in str(phrase):
@@ -272,12 +283,26 @@ def combine_root_and_phrases(nlp, ie, root, phrases):
                     modified_root = str(modified_root) + ' ' + str(new_phrase)
                 # Break the inner loop...
                 break
-        else:
-            # Continue if the inner loop wasn't broken.
-            continue
+            else:
+                # Continue if the inner loop wasn't broken.
+                continue
         # Inner loop was broken, break the outer.
         # break
-                
+
+    # Re-check 'root' and 'root_doc' before attempting to pluralize
+    if root.strip():  # Ensure 'root' is not empty or only whitespace
+        root_doc = nlp(root)  # It may be beneficial to ensure this happens once if it's resource-intensive
+        plural_root = ie.plural(root) if root_doc and root_doc[0].tag_ != "NNS" else root
+    else:
+        plural_root = root  # Use the original 'root' if it's empty or whitespace
+
+    # Now that 'plural_root' is safely obtained, determine if you should use it or 'root'
+    use_plural = any(plural_root in phrase for phrase in phrases)
+    root_to_use = plural_root if use_plural else root
+
+    # Combine the phrases with prefixes and suffixes
+    combined = ' '.join(filter(None, prefixes + [root_to_use] + suffixes)).strip()
+    return combined
     
     filtered_prefixes = remove_repeated_words(nlp, ie, prefixes)
     # Fake descriptor is usually first descriptor up front.
@@ -297,21 +322,24 @@ def remove_repeated_words(nlp, ie, combined_phrases, blacklist=[]):
         if " " not in combined_phrases[i] and combined_phrases[i] not in blacklist:
             for j in range(len(combined_phrases)):
                 word_doc = nlp(combined_phrases[i])
-                plural_noun = ie.plural(combined_phrases[i]) if word_doc[0].tag_ != "NNS" else combined_phrases[i]
-                singular_noun = ie.singular_noun(plural_noun)
-                
+
+                # Ensure the word is not empty or whitespace before calling plural or singular_noun
+                if not combined_phrases[i].strip():
+                    plural_noun = singular_noun = combined_phrases[i]
+                else:
+                    plural_noun = ie.plural(combined_phrases[i]) if word_doc[0].tag_ != "NNS" else combined_phrases[i]
+                    singular_noun = ie.singular_noun(plural_noun) if plural_noun else plural_noun
+
                 if singular_noun == False:
                     singular_noun = plural_noun
 
-                if i != j and plural_noun in combined_phrases[j]:
-                    combined_phrases[i] = '_REMOVE_'
-                    break
-                elif i != j and singular_noun in combined_phrases[j]:
+                if i != j and (plural_noun in combined_phrases[j] or singular_noun in combined_phrases[j]):
                     combined_phrases[i] = '_REMOVE_'
                     break
 
     combined_phrases = [phrase for i, phrase in enumerate(combined_phrases) if phrase != '_REMOVE_']
     return combined_phrases
+
 
 def process_gestures(img_json):
     suffix_dict = {}
