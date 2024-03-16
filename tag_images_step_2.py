@@ -204,8 +204,13 @@ for dirpath, dirnames, filenames in os.walk(args.image_directory):
             config = load_or_initialize_template(dirpath, args.default_template)
 
             image_path = os.path.join(dirpath, filename)
-            with open(os.path.join(dirpath, os.path.splitext(filename)[0]+'.json'), 'r', encoding='utf-8') as file:
-                combined_results = json.load(file)
+            try:
+                with open(os.path.join(dirpath, os.path.splitext(filename)[0]+'.json'), 'r', encoding='utf-8') as file:
+                    combined_results = json.load(file)
+            except FileNotFoundError as e:
+                print(f"Warning: Could not find file {e.filename}. Continuing with the next file.")
+                continue  # Skip to the next iteration of the loop, effectively ignoring the missing file
+
 
             # Check if 'caption' exists and is neither None nor an empty string
             if combined_results.get('caption') and args.overwrite == False:
