@@ -14,6 +14,7 @@ from openai import OpenAI
 import base64
 import json
 import demjson3
+import yaml
 
 # Point to the local server
 client = OpenAI(base_url="http://localhost:1234/v1", api_key="not-needed")
@@ -21,7 +22,7 @@ client = OpenAI(base_url="http://localhost:1234/v1", api_key="not-needed")
 def load_or_initialize_template(dirpath, default_template_path='./template_boilerplate.json'):
     """
     Loads a template JSON file from the specified directory. If it doesn't exist,
-    copies a default template into the directory, updates its 'llava_config'->'concept_focus'
+    copies a default template into the directory, updates its 'llm_config'->'concept_focus'
     to the directory name, and returns the template data.
 
     Parameters:
@@ -46,11 +47,11 @@ def load_or_initialize_template(dirpath, default_template_path='./template_boile
     
     # Update 'concept_focus' with the directory's name
     dir_name = os.path.basename(dirpath)  # Extracts the folder name
-    if 'llava_config' in template_data and 'concept_focus' in template_data['llava_config']:
-        template_data['llava_config']['concept_focus'] = dir_name
+    if 'llm_config' in template_data and 'concept_focus' in template_data['llm_config']:
+        template_data['llm_config']['concept_focus'] = dir_name
     else:
-        print("Warning: 'llava_config' or 'concept_focus' key not found. Adding them.")
-        template_data.setdefault('llava_config', {})['concept_focus'] = dir_name
+        print("Warning: 'llm_config' or 'concept_focus' key not found. Adding them.")
+        template_data.setdefault('llm_config', {})['concept_focus'] = dir_name
 
     # Return the updated template data
     return template_data
@@ -180,7 +181,11 @@ def generate_unique_id(length=8):
 
 
 
-
+## system prompt
+## expert list
+## default message 'Describe this image using your template AND all of the system prompt instructions.'
+## expert attachment to the message
+## 
 
 
 
@@ -193,9 +198,7 @@ parser.add_argument("--default_template", help="Choose the template file to use 
 parser.add_argument("--skipconcept", action="store_true", help="Skip adding a customized concept per subdirectory.")
 args = parser.parse_args()
 
-with open(r".\\prompts\\system_prompt_COT.txt", 'r', encoding='utf-8') as file:
-    system_prompt = file.read()
-chat_prompt = 'Describe this image using your template AND all of the system prompt instructions.'
+
 
 for dirpath, dirnames, filenames in os.walk(args.image_directory):
     for filename in filenames:
@@ -206,28 +209,33 @@ for dirpath, dirnames, filenames in os.walk(args.image_directory):
             image_path = os.path.join(dirpath, filename)
             try:
                 with open(os.path.join(dirpath, os.path.splitext(filename)[0]+'.json'), 'r', encoding='utf-8') as file:
-                    combined_results = json.load(file)
+                    image_meta_json = json.load(file)
             except FileNotFoundError as e:
                 print(f"Warning: Could not find file {e.filename}. Continuing with the next file.")
                 continue  # Skip to the next iteration of the loop, effectively ignoring the missing file
-
-
             # Check if 'caption' exists and is neither None nor an empty string
-            if combined_results.get('caption') and args.overwrite == False:
+            if image_meta_json.get('caption') and args.overwrite == False:
                 continue
             
-            template_internal = config['llava_config']['template_internal']
-            template_blank = {key: '' for key in config['llava_config']['template_internal']}
+            system_prompt_path = config['llm_config']['system_prompt']
+            default_prompt_path = config['llm_config']['default_prompt']
+            expert_list = config['llm_config']['expert_list']
+            concept_focus = config['llm_config']['concept_focus']
             
-            if args.skipconcept:
-                template = 'OUTPUT_TEMPLATE_WITH_INTERNAL_INSTRUCTIONS: ' + json.dumps(template_internal) + ' OUTPUT_TEMPLATE: ' + json.dumps(template_blank) + ' CAPTION_FILE: ' + combined_results['processed']
-            else:
-                concept_focus = config['llava_config']['concept_focus']
-                template = 'OUTPUT_TEMPLATE_WITH_INTERNAL_INSTRUCTIONS: ' + json.dumps(template_internal) + ' OUTPUT_TEMPLATE: ' + json.dumps(template_blank) + ' CONCEPT_FOCUS: ' + concept_focus + ' CAPTION_FILE: ' + combined_results['processed']
+            # template = config['llm_config']['template']
+            # template_blank = {key: '' for key in config['llm_config']['template']}
+
             
+            with open(os.path.join('.','prompts',system_prompt_path), 'r', encoding='utf-8') as file:
+                system_prompt = file.read()
+            with open(os.path.join('.','prompts',default_prompt_path), 'r', encoding='utf-8') as file:
+                chat_prompt = file.read()
+
             path = image_path
             base64_image = ""
+            
             try:
+            
                 if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.bmp', '.gif', '.tiff', '.webp', '.webm')):
                         
                     with Image.open(image_path) as img:
@@ -246,133 +254,59 @@ for dirpath, dirnames, filenames in os.walk(args.image_directory):
                 print("Couldn't read the image. Make sure the path is correct and the file exists.")
                 continue
 
-            try_again = True
-            temp_modifier = 0.0
-            while try_again:
-                completion = client.chat.completions.create(
-                    model="local-model", # not used
-                    messages=[
-                    {
-                        "role": "system",
-                        "content": system_prompt + template,
-                    },
-                    {
-                        "role": "user",
-                        "content": [
-                        {"type": "text", "text": chat_prompt},
-                        {
-                            "type": "image_url",
-                            "image_url": {
-                            "url": f"data:image/jpeg;base64,{base64_image}"
-                            },
-                        },
-                        ],
-                    }
-                    ],
-                    max_tokens=32000,
-                    stream=False,
-                    temperature=0.2 + temp_modifier,
-                    presence_penalty=1.1,
-                    top_p=0.95
-                )
+            for expert_path in expert_list:
+                with open(os.path.join('.','prompts',expert_path), 'r') as file:
+                    expert_data = yaml.safe_load(file)
+                    
+                expert_name = expert_data['expert_name']
+                expert_system_prompt = expert_data['expert_system_prompt']
+                expert_conversation_prompt = expert_data['expert_conversation_prompt']
 
-                # content = completion.choices[0].message.content
-                # returned_json = json.loads(content)
+                expert_system_append = expert_name + '\n\n' + expert_system_prompt
 
-                returned_json = None
-                for choice in completion.choices:
-                    try:
-                        # Attempt to parse the JSON content
-                        content = choice.message.content.replace("\n", "")
-                        returned_json = json.loads(content)
-                        # If the above line does not raise an error, break out of the loop
-                        break
-                    except json.JSONDecodeError:
-                        try:
-                            # Attempt to parse the JSON content
-                            returned_json = demjson3.decode(content)
-                            # If the above line does not raise an error, break out of the loop
-                            break
-                        except demjson3.JSONDecodeError as e:
-                            print(f"Error parsing JSON: {e}")
-                            continue
-
-                # Check if we successfully parsed any JSON
-                if returned_json:
-                    print("Successfully parsed JSON:", returned_json)
-                    try_again = False
-                temp_modifier += 0.01
-            
-            combined_results['llm'] = returned_json
-            cot_substrings = ["chain", "of", "thought"]
-            # Iterate over a list of keys (to avoid RuntimeError for changing dict size during iteration)
-            for key in list(returned_json.keys()):
-                # Check if all substrings are present in the key, ignoring non-alphanumeric characters in the key
-                if all(sub in ''.join(filter(str.isalnum, key)).lower() for sub in cot_substrings):
-                    # If found, pop the key and break, assuming only one such key needs to be removed
-                    returned_json.pop(key)
-                    break
-                
-            conceptfocus_substrings = ["concept", "focus"]
-            # Iterate over a list of keys (to avoid RuntimeError for changing dict size during iteration)
-            for key in list(returned_json.keys()):
-                # Check if all substrings are present in the key, ignoring non-alphanumeric characters in the key
-                if all(sub in ''.join(filter(str.isalnum, key)).lower() for sub in conceptfocus_substrings):
-                    # If found, pop the key and break, assuming only one such key needs to be removed
-                    returned_json.pop(key)
-                    break
-            def process_value(value):
-                """
-                Recursively process the input value to handle strings, lists, and dictionaries.
-                Converts dictionaries to strings by concatenating their values, potentially leading to nested calls.
-                """
-                if isinstance(value, list):
-                    return ', '.join(process_value(subvalue) for subvalue in value)
-                elif isinstance(value, dict):
-                    # If the value is a dictionary, recursively process its values
-                    return ', '.join(process_value(subvalue) for subvalue in value.values())
+                if args.skipconcept:
+                    template = expert_system_append + '\nCAPTION_FILE: ' + image_meta_json['processed']
                 else:
-                    # For strings or other types that can be directly converted to strings
-                    return value.replace('.', ',').strip()
-    
-            concatenated_values = ', '.join(process_value(value) for value in returned_json.values())
-            
-            # # Part 1: Process the dictionary and concatenate values
-            # concatenated_values = ', '.join([
-            #     ', '.join([subvalue.replace('.', ',').strip() for subvalue in value]) if isinstance(value, list) 
-            #     else value.replace('.', ',').strip()
-            #     for value in returned_json.values()
-            # ])
+                    template = expert_system_append + '\nCONCEPT_FOCUS: ' + concept_focus + '\nCAPTION_FILE: ' + image_meta_json['processed']
 
-            # Part 2: Process the comma delimited string, compare, and append if necessary
-            # Convert the comma delimited string into a list
-                        
-            relevant_tags = returned_json.get('relevant_tags', [])
-            
-            comma_delimited_list = combined_results['processed'].split(',')
-            comma_delimited_list = [value.replace('.', '').strip() for value in comma_delimited_list]
-            relevant_tags = [value.replace('.', '').strip() for value in relevant_tags]
-            combined_set = set(comma_delimited_list + relevant_tags)
-            comma_delimited_list = list(combined_set)
+                try_again = True
+                temp_modifier = 0.0
+                while try_again:
+                    completion = client.chat.completions.create(
+                        model="local-model", # not used
+                        messages=[
+                        {
+                            "role": "system",
+                            "content": system_prompt + template,
+                        },
+                        {
+                            "role": "user",
+                            "content": [
+                            {"type": "text", "text": chat_prompt},
+                            {
+                                "type": "image_url",
+                                "image_url": {
+                                "url": f"data:image/jpeg;base64,{base64_image}"
+                                },
+                            },
+                            ],
+                        }
+                        ],
+                        max_tokens=32000,
+                        stream=False,
+                        temperature=0.2 + temp_modifier,
+                        presence_penalty=1.2,
+                        top_p=0.95
+                    )
+                    
+                    returned_message = completion.choices[0].message.content
+                    try_again = False
+                    temp_modifier += 0.01
+                    
+                image_meta_json.setdefault('expert_list', {})
+                image_meta_json['expert_list'][expert_name] = returned_message
 
-            # Trim whitespace and check if each element is not in the concatenated string
-            elements_not_in_concatenated = [element.strip() for element in comma_delimited_list if element.strip() not in concatenated_values]
-
-            # If there are elements not in the concatenated string, append them
-            if elements_not_in_concatenated:
-                if concatenated_values:  # Check if concatenated_values is not empty
-                    concatenated_values += ', '  # Add a separator before appending new elements
-                concatenated_values += ', '.join(elements_not_in_concatenated)
-                
-            # 'concatenated_values' now contains all substrings processed as per the instructions
-            combined_results['caption'] = concatenated_values
-
-            json_path = os.path.splitext(image_path)[0] + '.json'
-            with open(json_path, 'w') as json_file:
-                json.dump(combined_results, json_file, cls=NumpyEncoder, indent=4)
-                
-            txt_path = os.path.splitext(image_path)[0] + '.txt'
-            with open(txt_path, 'w', encoding='utf-8') as txt_file:
-                txt_file.write(concatenated_values)
-                
-            print(f"Saved combined results to {json_path} and {txt_path}.")
+                json_path = os.path.splitext(image_path)[0] + '.json'
+                with open(json_path, 'w') as json_file:
+                    json.dump(image_meta_json, json_file, cls=NumpyEncoder, indent=4)
+                print(f"Saved combined results to {json_path}.")
