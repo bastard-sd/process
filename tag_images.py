@@ -169,14 +169,13 @@ if os.path.exists(template_file):
 else:
     config = copy_template_to_image_directory(args.image_directory)
 
-
-tag_threshold = config['tagger_config']['tag_threshold']
-character_threshold = config['tagger_config']['character_threshold']
+tagger_config = config.get('tagger_config', {})
+tag_threshold = tagger_config.get('tag_threshold', 0.35)
+character_threshold = tagger_config.get('character_threshold', 0.85)
 processor = ImageTagger(tag_threshold=tag_threshold, ratio_threshold=tag_threshold, character_threshold=character_threshold)
 
 spacy_model = loadmodel("en_core_web_lg", 'cuda:0')
 inflect_model = loadinflectmodel()
-
 
 for filename in renamed_filelist:
     print(filename)

@@ -271,12 +271,12 @@ for dirpath, dirnames, filenames in os.walk(args.image_directory):
                 expert_system_prompt = expert_data['expert_system_prompt']
                 expert_conversation_prompt = expert_data['expert_conversation_prompt']
 
-                expert_system_append = expert_name + '\n\n' + expert_system_prompt
+                expert_system_append = expert_name + '\n' + expert_system_prompt
 
                 if args.skipconcept:
-                    template = expert_system_append + '\nCAPTION_FILE: ' + image_meta_yaml['general']
+                    template = expert_system_append + '\TAG_FILE: ' + image_meta_yaml['general']
                 else:
-                    template = expert_system_append + '\nCONCEPT_FOCUS: ' + concept_focus + '\nCAPTION_FILE: ' + image_meta_yaml['general']
+                    template = expert_system_append + '\nCONCEPT_FOCUS: ' + concept_focus + '\TAG_FILE: ' + image_meta_yaml['general']
 
                 system_prompt_combined = system_prompt + template
                 print('system_prompt_combined')
@@ -284,7 +284,7 @@ for dirpath, dirnames, filenames in os.walk(args.image_directory):
                 print('chat_prompt')
                 print(chat_prompt)
                 
-                chat_prompt
+                
                 try_again = True
                 temp_modifier = 0.0
                 while try_again:
@@ -298,7 +298,7 @@ for dirpath, dirnames, filenames in os.walk(args.image_directory):
                         {
                             "role": "user",
                             "content": [
-                            {"type": "text", "text": chat_prompt},
+                            {"type": "text", "text": chat_prompt + expert_conversation_prompt},
                             {
                                 "type": "image_url",
                                 "image_url": {

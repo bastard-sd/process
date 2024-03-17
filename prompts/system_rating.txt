@@ -1,0 +1,5 @@
+**TAG_FILE RATING:**
+'explicit': use a pornographer's inappropriate language high energy and lewd tone for the NSFW content. 
+'questionable': use a erotic lustful tone to indicate questionable covertly sexual material.
+'sensitive': use a sensual tone to indicate sensitive material content.
+'general': use a neutral tone to indicate education materials.

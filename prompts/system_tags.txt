@@ -1,0 +1,6 @@
+**TAG_FILE:**
+A TAG_FILE in YAML format will be provided that will include these categories:
+- character: the name of the character(s) in the image.
+- general: a comma delimited list of concepts in the image
+- rating: image rating for sexual content
+Use the `general` category to build a list of concepts about the image to use during the EXPERT evaluation.

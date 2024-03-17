@@ -1,0 +1,4 @@
+Describe this image using all of your system prompt instructions.
+
+Describe this image using the given:
+TAG_FILE
