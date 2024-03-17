@@ -30,34 +30,28 @@ def copy_template_to_image_directory(image_directory, template_file='./templates
     - image_directory: The path to the directory where the template YAML file will be copied.
     """
 
-    # Check if the image directory exists
     if not os.path.isdir(image_directory):
         print(f"The directory {image_directory} does not exist.")
         return
     
-    # Check if the template file exists
     if not os.path.isfile(template_file):
         print("Template file './templates/template.yaml' does not exist.")
         return
     
-    # Construct the destination path for the template file in the image directory
     destination_path = os.path.join(image_directory, os.path.basename(template_file))
     
-    # Copy the template file to the destination
+    if os.path.isfile(destination_path):
+        print(f"Template file already exists at {destination_path}.")
+        return
+    
     shutil.copy(template_file, destination_path)
-    
     print(f"Template file copied to {destination_path}.")
-    
-    # Load the YAML content into a dictionary
     try:
         with open(destination_path, 'r') as file:
             template_data = yaml.safe_load(file)
             print("Template YAML loaded into dictionary.")
             return template_data
-    # except json.JSONDecodeError as e:
-    #     print(f"Error loading JSON from template file: {e}")
-    #     return None
-    except yaml.YAMLError:
+    except yaml.YAMLError as e:
         print(f"Error loading YAML from template file: {e}")
         return None
 
