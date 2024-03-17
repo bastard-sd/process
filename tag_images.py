@@ -189,18 +189,21 @@ for filename in renamed_filelist:
     # Proceed with processing the image if no YAML file exists
     if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.bmp', '.gif', '.tiff', '.webp', '.webm')):
         image_path = filename
-        combined_results = processor.process_image(image_path)
-        
-        # try:
-        #     fully_processed_prompt = process_input_tags(spacy_model, inflect_model, [], combined_results['general'])
-        #     combined_results['processed'] = fully_processed_prompt
-        # except Exception as e:
-        #     print(f"Error processing tags for {filename}: {e}. Skipping this step.")
-        #     print(f"Moving {filename} to error directory.")
-        #     shutil.move(image_path, os.path.join(args.error_directory, os.path.basename(filename)))
-        #     # Optionally, you can decide to continue, break, or take any specific action here
-        #     continue  # or use 'break' to stop the loop, or 'pass' to do nothing further
-
-        with open(yaml_path, 'w') as yaml_file:
-            yaml.dump(combined_results, yaml_file, allow_unicode=True, default_flow_style=False, indent=4)
-        print(f"Saved combined results to {yaml_path}.")
+        try:
+            combined_results = processor.process_image(image_path)
+            # try:
+            #     fully_processed_prompt = process_input_tags(spacy_model, inflect_model, [], combined_results['general'])
+            #     combined_results['processed'] = fully_processed_prompt
+            # except Exception as e:
+            #     print(f"Error processing tags for {filename}: {e}. Skipping this step.")
+            #     print(f"Moving {filename} to error directory.")
+            #     shutil.move(image_path, os.path.join(args.error_directory, os.path.basename(filename)))
+            #     # Optionally, you can decide to continue, break, or take any specific action here
+            #     continue  # or use 'break' to stop the loop, or 'pass' to do nothing further
+            
+            # Assuming success, proceed to save the combined_results to a YAML file
+            with open(yaml_path, 'w') as yaml_file:
+                yaml.dump(combined_results, yaml_file, allow_unicode=True, default_flow_style=False, indent=4)
+            print(f"Saved combined results to {yaml_path}.")
+        except Exception as e:  # Catching a general exception to handle any kind of failure in process_image
+            print(f"Failed to process image {image_path}. Error: {e}")
