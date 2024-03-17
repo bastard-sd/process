@@ -99,9 +99,9 @@ def copy_template_to_image_directory(image_directory, template_file='./templates
             template_data = yaml.safe_load(file)
             print("Template YAML loaded into dictionary.")
             return template_data
-    # except YAML.YAMLDecodeError as e:
-    #     print(f"Error loading YAML from template file: {e}")
-    #     return None
+    except yaml.YAMLDecodeError as e:
+        print(f"Error loading YAML from template file: {e}")
+        return None
 
 def load_image(image_path, error_directory):
     try:
