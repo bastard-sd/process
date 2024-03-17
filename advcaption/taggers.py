@@ -8,10 +8,10 @@ import pandas as pd
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 NETWORKS_DIR = "./networks"
-MOAT_MODEL_REPO = "wd-v1-4-moat-tagger-v2"
-SWIN_MODEL_REPO = "wd-swinv2-tagger-v3"
-CONV_MODEL_REPO = "wd-v1-4-convnextv2-tagger-v2"
-VIT_MODEL_REPO = "wd-v1-4-vit-tagger-v2"
+MOAT_MODEL_REPO = "moat"
+SWIN_MODEL_REPO = "swin"
+CONV_MODEL_REPO = "conv"
+VIT_MODEL_REPO = "tag"
 MODEL_FILENAME = "model.onnx"
 LABEL_FILENAME = "selected_tags.csv"
 

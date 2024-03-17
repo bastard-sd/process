@@ -7,15 +7,10 @@ pip install -r requirements.txt
 
 python -m spacy download en_core_web_lg
 cd .\networks\
-git clone https://huggingface.co/SmilingWolf/wd-v1-4-moat-tagger-v2
-git clone https://huggingface.co/SmilingWolf/wd-v1-4-convnextv2-tagger-v2
-git clone https://huggingface.co/SmilingWolf/wd-v1-4-swinv2-tagger-v2
-git clone https://huggingface.co/SmilingWolf/wd-v1-4-vit-tagger-v2
-
-git clone https://huggingface.co/SmilingWolf/wd-convnext-tagger-v3
-git clone https://huggingface.co/SmilingWolf/wd-swinv2-tagger-v3
-git clone https://huggingface.co/SmilingWolf/wd-vit-tagger-v3
-git clone https://huggingface.co/SmilingWolf/wd-v1-4-moat-tagger-v2
+git clone https://huggingface.co/SmilingWolf/wd-convnext-tagger-v3 conv
+git clone https://huggingface.co/SmilingWolf/wd-swinv2-tagger-v3 swin
+git clone https://huggingface.co/SmilingWolf/wd-vit-tagger-v3 vit
+git clone https://huggingface.co/SmilingWolf/wd-v1-4-moat-tagger-v2 moat
 ```
 
 ```

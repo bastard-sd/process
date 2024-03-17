@@ -11,8 +11,7 @@ import io
 # Adapted from OpenAI's Vision example 
 from openai import OpenAI
 import base64
-import json
-import demjson3
+import demYAML3
 import yaml
 
 # Point to the local server
@@ -20,7 +19,7 @@ client = OpenAI(base_url="http://localhost:1234/v1", api_key="not-needed")
 
 def load_or_initialize_template(dirpath, default_template_path='./tempalte/template.yaml'):
     """
-    Loads a template JSON file from the specified directory. If it doesn't exist,
+    Loads a template YAML file from the specified directory. If it doesn't exist,
     copies a default template into the directory, updates its 'llm_config'->'concept_focus'
     to the directory name, and returns the template data.
 
@@ -29,7 +28,7 @@ def load_or_initialize_template(dirpath, default_template_path='./tempalte/templ
     - default_template_path: Path to the default template file.
     
     Returns:
-    A dictionary representing the loaded or initialized template JSON data.
+    A dictionary representing the loaded or initialized template YAML data.
     """
     template_file = os.path.join(dirpath, 'template.yaml')
 
@@ -56,7 +55,7 @@ def load_or_initialize_template(dirpath, default_template_path='./tempalte/templ
     return template_data
 
 
-# class NumpyEncoder(json.JSONEncoder):
+# class NumpyEncoder(YAML.YAMLEncoder):
 #     """ Custom encoder for numpy data types """
 #     def default(self, obj):
 #         if isinstance(obj, np.integer):
@@ -70,10 +69,10 @@ def load_or_initialize_template(dirpath, default_template_path='./tempalte/templ
 
 def copy_template_to_image_directory(image_directory, template_file='./templates/template.yaml'):
     """
-    Copies the template JSON file './templates.yaml' into the specified image directory.
+    Copies the template YAML file './templates.yaml' into the specified image directory.
 
     Parameters:
-    - image_directory: The path to the directory where the template JSON file will be copied.
+    - image_directory: The path to the directory where the template YAML file will be copied.
     """
 
     # Check if the image directory exists
@@ -94,15 +93,15 @@ def copy_template_to_image_directory(image_directory, template_file='./templates
     
     print(f"Template file copied to {destination_path}.")
     
-    # Load the JSON content into a dictionary
+    # Load the YAML content into a dictionary
     try:
         with open(destination_path, 'r') as file:
             template_data = yaml.safe_load(file)
-            print("Template JSON loaded into dictionary.")
+            print("Template YAML loaded into dictionary.")
             return template_data
-    except json.JSONDecodeError as e:
-        print(f"Error loading JSON from template file: {e}")
-        return None
+    # except YAML.YAMLDecodeError as e:
+    #     print(f"Error loading YAML from template file: {e}")
+    #     return None
 
 def load_image(image_path, error_directory):
     try:
@@ -208,12 +207,12 @@ for dirpath, dirnames, filenames in os.walk(args.image_directory):
             image_path = os.path.join(dirpath, filename)
             try:
                 with open(os.path.join(dirpath, os.path.splitext(filename)[0]+'.yaml'), 'r', encoding='utf-8') as file:
-                    image_meta_json = yaml.safe_load(file)
+                    image_meta_yaml = yaml.safe_load(file)
             except FileNotFoundError as e:
                 print(f"Warning: Could not find file {e.filename}. Continuing with the next file.")
                 continue  # Skip to the next iteration of the loop, effectively ignoring the missing file
             # Check if 'caption' exists and is neither None nor an empty string
-            if image_meta_json.get('caption') and args.overwrite == False:
+            if image_meta_yaml.get('caption') and args.overwrite == False:
                 continue
             
             system_prompt_paths = config['llm_config']['system_prompt']
@@ -276,9 +275,9 @@ for dirpath, dirnames, filenames in os.walk(args.image_directory):
                 expert_system_append = expert_name + '\n\n' + expert_system_prompt
 
                 if args.skipconcept:
-                    template = expert_system_append + '\nCAPTION_FILE: ' + image_meta_json['general']
+                    template = expert_system_append + '\nCAPTION_FILE: ' + image_meta_yaml['general']
                 else:
-                    template = expert_system_append + '\nCONCEPT_FOCUS: ' + concept_focus + '\nCAPTION_FILE: ' + image_meta_json['general']
+                    template = expert_system_append + '\nCONCEPT_FOCUS: ' + concept_focus + '\nCAPTION_FILE: ' + image_meta_yaml['general']
 
                 try_again = True
                 temp_modifier = 0.0
@@ -314,10 +313,10 @@ for dirpath, dirnames, filenames in os.walk(args.image_directory):
                     try_again = False
                     temp_modifier += 0.01
                     
-                image_meta_json.setdefault('expert_list', {})
-                image_meta_json['expert_list'][expert_name] = returned_message
+                image_meta_yaml.setdefault('expert_list', {})
+                image_meta_yaml['expert_list'][expert_name] = returned_message
 
                 yaml_path = os.path.splitext(image_path)[0] + '.yaml'
                 with open(yaml_path, 'w') as yaml_file:
-                    json.dump(image_meta_json, yaml_file, indent=4)
+                    yaml.dump(image_meta_yaml, yaml_file, allow_unicode=True, default_flow_style=False, indent=4)
                 print(f"Saved combined results to {yaml_path}.")
