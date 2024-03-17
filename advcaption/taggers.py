@@ -9,7 +9,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 NETWORKS_DIR = "./networks"
 MOAT_MODEL_REPO = "wd-v1-4-moat-tagger-v2"
-SWIN_MODEL_REPO = "wd-v1-4-swinv2-tagger-v2"
+SWIN_MODEL_REPO = "wd-swinv2-tagger-v3"
 CONV_MODEL_REPO = "wd-v1-4-convnextv2-tagger-v2"
 VIT_MODEL_REPO = "wd-v1-4-vit-tagger-v2"
 MODEL_FILENAME = "model.onnx"
@@ -110,6 +110,8 @@ class ImageTagger:
         img_th = img_th.astype(np.float32)
         img_th = np.expand_dims(img_th, 0)  # Add batch dimension
 
+
+        print(1)
         # Perform prediction
         probs = model.run([label_name], {input_name: img_th})[0]
         labels = list(zip(tag_names, probs[0].astype(float)))
@@ -170,13 +172,11 @@ class ImageTagger:
         image = np.array(new_image.convert("RGB"))
 
         result_tags = []
-        with ThreadPoolExecutor() as executor:
-            futures = [
-                executor.submit(self.predict, raw_image, image, model_name, path)
-                for path, model_name in zip([MODEL_LABEL_PATHS['moat'], MODEL_LABEL_PATHS['swin'], MODEL_LABEL_PATHS['conv'], MODEL_LABEL_PATHS['vit']], self.models.keys())
-            ]
-            for future in as_completed(futures):
-                result_tags.append(future.result())
+        for model_name in self.models.keys():
+            path = MODEL_LABEL_PATHS[model_name]
+            print(model_name)
+            result = self.predict(raw_image, image, model_name, path)
+            result_tags.append(result)
 
         combined_results = self.combine_dicts(result_tags)
         return combined_results

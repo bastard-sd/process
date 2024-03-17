@@ -196,7 +196,6 @@ for filename in renamed_filelist:
     # Proceed with processing the image if no YAML file exists
     if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.bmp', '.gif', '.tiff', '.webp', '.webm')):
         image_path = filename
-        print('process_image')
         combined_results = processor.process_image(image_path)
         
         # try:

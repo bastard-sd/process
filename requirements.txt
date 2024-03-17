@@ -3,7 +3,7 @@ demjson3
 Flask
 inflect
 numpy
-onnxruntime_gpu
+onnxruntime-gpu
 onnxruntime
 openai
 opencv_python
@@ -12,3 +12,4 @@ pandas
 Pillow
 Requests
 spacy
+pyyaml

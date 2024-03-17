@@ -216,17 +216,29 @@ for dirpath, dirnames, filenames in os.walk(args.image_directory):
             if image_meta_json.get('caption') and args.overwrite == False:
                 continue
             
-            system_prompt_path = config['llm_config']['system_prompt']
+            system_prompt_paths = config['llm_config']['system_prompt']
             default_prompt_path = config['llm_config']['default_prompt']
             expert_list = config['llm_config']['expert_list']
             concept_focus = config['llm_config']['concept_focus']
             
             # template = config['llm_config']['template']
             # template_blank = {key: '' for key in config['llm_config']['template']}
-
             
-            with open(os.path.join('.','prompts',system_prompt_path), 'r', encoding='utf-8') as file:
-                system_prompt = file.read()
+            # Initialize an empty string to hold the concatenated contents of all files
+            system_prompt = ""
+
+            # Iterate over each path in the system_prompt_paths list
+            for path in system_prompt_paths:
+                # Construct the full path to the file
+                file_path = os.path.join('.', 'prompts', path)
+                
+                # Open and read the file, then append its content to system_prompt
+                with open(file_path, 'r', encoding='utf-8') as file:
+                    # If system_prompt is not empty, add a newline for separation before appending more content
+                    if system_prompt:
+                        system_prompt += "\n"
+                    system_prompt += file.read()
+
             with open(os.path.join('.','prompts',default_prompt_path), 'r', encoding='utf-8') as file:
                 chat_prompt = file.read()
 
@@ -264,9 +276,9 @@ for dirpath, dirnames, filenames in os.walk(args.image_directory):
                 expert_system_append = expert_name + '\n\n' + expert_system_prompt
 
                 if args.skipconcept:
-                    template = expert_system_append + '\nCAPTION_FILE: ' + image_meta_json['processed']
+                    template = expert_system_append + '\nCAPTION_FILE: ' + image_meta_json['general']
                 else:
-                    template = expert_system_append + '\nCONCEPT_FOCUS: ' + concept_focus + '\nCAPTION_FILE: ' + image_meta_json['processed']
+                    template = expert_system_append + '\nCONCEPT_FOCUS: ' + concept_focus + '\nCAPTION_FILE: ' + image_meta_json['general']
 
                 try_again = True
                 temp_modifier = 0.0
