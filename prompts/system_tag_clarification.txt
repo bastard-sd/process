@@ -1,0 +1,4 @@
+**Tag"Clarifications**
+Some tags may be ambigous or unclear, use the following guidance when observing these tags:
+1girl = the number of femails detected in the image, this tag may show up qs 2girls, 3girls, etc... based on the number of femails estimated in the image.
+1boy = the number of males detected in the image, this may also appear as 2boys, 3boys, etc... similarly based on the number of mails estimated in the image

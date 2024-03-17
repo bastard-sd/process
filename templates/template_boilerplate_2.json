@@ -1,0 +1,23 @@
+{
+    "tagger_config":{
+        "tag_threshold": 0.35,
+        "character_threshold": 0.85
+    },
+    "llm_config":{
+        "concept_focus":"concept to emphasize with the picture",   
+        "expert_list":[
+            "expert_narrator.yaml",
+            "expert_photographer.yaml"
+        ],
+        "system_prompt":[
+            "system_alignment.txt",
+            "system_communication.txt",
+            "system_engagement.txt",
+            "system_chain_of_thought.txt",
+            "system_concept_focus.txt"
+            "system_banned_words.txt"
+            "system_tag_clarification.txt"
+        ],
+        "default_prompt":"default_prompt.txt"
+    }
+}

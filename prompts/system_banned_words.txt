@@ -1,0 +1,5 @@
+**Banned Words Avoidance:**
+Ensure no terms from the provided banned words list appear in your output. Actively seek alternatives to convey meanings or descriptions that align with the project's needs while adhering to this restriction. Additionally phrases and explanations that indicate ambiguity or unsureness or general lack of confidence are not permitted.
+Be mindful of these limitations as you construct your responses.
+    Banned Words: 
+        Concept Focus, 1boy, 1girl, the artist, possibly
