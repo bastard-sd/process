@@ -44,11 +44,8 @@ def load_or_initialize_template(dirpath, default_template_path='./tempalte/templ
     
     # Update 'concept_focus' with the directory's name
     dir_name = os.path.basename(dirpath)  # Extracts the folder name
-    if 'llm_config' in template_data and 'concept_focus' in template_data['llm_config']:
+    if 'llm_config' in template_data and 'concept_focus' not in template_data['llm_config']:
         template_data['llm_config']['concept_focus'] = dir_name
-    else:
-        print("Warning: 'llm_config' or 'concept_focus' key not found. Adding them.")
-        template_data.setdefault('llm_config', {})['concept_focus'] = dir_name
 
     # Return the updated template data
     return template_data
