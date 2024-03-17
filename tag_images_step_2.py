@@ -214,7 +214,7 @@ for dirpath, dirnames, filenames in os.walk(args.image_directory):
             if image_meta_yaml.get('caption') and args.overwrite == False:
                 continue
             
-            system_prompt_paths = config['llm_config']['system_prompt']
+            system_prompt_paths = config['llm_config'].get('system_prompt', [])
             default_prompt_path = config['llm_config']['default_prompt']
             expert_list = config['llm_config']['expert_list']
             concept_focus = config['llm_config']['concept_focus']
