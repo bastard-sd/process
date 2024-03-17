@@ -278,6 +278,13 @@ for dirpath, dirnames, filenames in os.walk(args.image_directory):
                 else:
                     template = expert_system_append + '\nCONCEPT_FOCUS: ' + concept_focus + '\nCAPTION_FILE: ' + image_meta_yaml['general']
 
+                system_prompt_combined = system_prompt + template
+                print('system_prompt_combined')
+                print(system_prompt_combined)
+                print('chat_prompt')
+                print(chat_prompt)
+                
+                chat_prompt
                 try_again = True
                 temp_modifier = 0.0
                 while try_again:
