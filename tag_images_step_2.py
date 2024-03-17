@@ -5,7 +5,6 @@ import shutil
 import subprocess
 import uuid
 import argparse
-import json
 from advcaption.taggers import ImageTagger
 import io
 
@@ -19,7 +18,7 @@ import yaml
 # Point to the local server
 client = OpenAI(base_url="http://localhost:1234/v1", api_key="not-needed")
 
-def load_or_initialize_template(dirpath, default_template_path='./template_boilerplate.json'):
+def load_or_initialize_template(dirpath, default_template_path='./tempalte/template.yaml'):
     """
     Loads a template JSON file from the specified directory. If it doesn't exist,
     copies a default template into the directory, updates its 'llm_config'->'concept_focus'
@@ -32,9 +31,9 @@ def load_or_initialize_template(dirpath, default_template_path='./template_boile
     Returns:
     A dictionary representing the loaded or initialized template JSON data.
     """
-    template_file = os.path.join(dirpath, 'template.json')
+    template_file = os.path.join(dirpath, 'template.yaml')
 
-    # Check if the specific template.json file exists in the directory
+    # Check if the specific template.yaml file exists in the directory
     if not os.path.isfile(template_file):
         print(f"'{template_file}' does not exist. Using default template instead.")
         template_file = default_template_path
@@ -43,7 +42,7 @@ def load_or_initialize_template(dirpath, default_template_path='./template_boile
 
     # Load the template data from either the existing or the copied default template file
     with open(template_file, 'r', encoding='utf-8') as file:
-        template_data = json.load(file)
+        template_data = yaml.safe_load(file)
     
     # Update 'concept_focus' with the directory's name
     dir_name = os.path.basename(dirpath)  # Extracts the folder name
@@ -57,21 +56,21 @@ def load_or_initialize_template(dirpath, default_template_path='./template_boile
     return template_data
 
 
-class NumpyEncoder(json.JSONEncoder):
-    """ Custom encoder for numpy data types """
-    def default(self, obj):
-        if isinstance(obj, np.integer):
-            return int(obj)
-        elif isinstance(obj, np.floating):
-            return float(obj)
-        elif isinstance(obj, np.ndarray):
-            return obj.tolist()
-        else:
-            return super(NumpyEncoder, self).default(obj)
+# class NumpyEncoder(json.JSONEncoder):
+#     """ Custom encoder for numpy data types """
+#     def default(self, obj):
+#         if isinstance(obj, np.integer):
+#             return int(obj)
+#         elif isinstance(obj, np.floating):
+#             return float(obj)
+#         elif isinstance(obj, np.ndarray):
+#             return obj.tolist()
+#         else:
+#             return super(NumpyEncoder, self).default(obj)
 
-def copy_template_to_image_directory(image_directory, template_file='./template_boilerplate.json'):
+def copy_template_to_image_directory(image_directory, template_file='./templates/template.yaml'):
     """
-    Copies the template JSON file './template.json' into the specified image directory.
+    Copies the template JSON file './templates.yaml' into the specified image directory.
 
     Parameters:
     - image_directory: The path to the directory where the template JSON file will be copied.
@@ -84,11 +83,11 @@ def copy_template_to_image_directory(image_directory, template_file='./template_
     
     # Check if the template file exists
     if not os.path.isfile(template_file):
-        print("Template file './template.json' does not exist.")
+        print("Template file './templates.yaml' does not exist.")
         return
     
     # Construct the destination path for the template file in the image directory
-    destination_path = os.path.join(image_directory, 'template.json')
+    destination_path = os.path.join(image_directory, 'template.yaml')
     
     # Copy the template file to the destination
     shutil.copy(template_file, destination_path)
@@ -98,7 +97,7 @@ def copy_template_to_image_directory(image_directory, template_file='./template_
     # Load the JSON content into a dictionary
     try:
         with open(destination_path, 'r') as file:
-            template_data = json.load(file)
+            template_data = yaml.safe_load(file)
             print("Template JSON loaded into dictionary.")
             return template_data
     except json.JSONDecodeError as e:
@@ -194,7 +193,7 @@ def generate_unique_id(length=8):
 parser = argparse.ArgumentParser(description="Process images in a directory.")
 parser.add_argument("--image_directory", help="The directory containing images to process.")
 parser.add_argument("--overwrite", action="store_true", help="Overwrite the LLM captions from a previous run.")
-parser.add_argument("--default_template", help="Choose the template file to use as your default.", default="template_boilerplate.json")
+parser.add_argument("--default_template", help="Choose the template file to use as your default.", default="./templates/template.yaml")
 parser.add_argument("--skipconcept", action="store_true", help="Skip adding a customized concept per subdirectory.")
 args = parser.parse_args()
 
@@ -208,8 +207,8 @@ for dirpath, dirnames, filenames in os.walk(args.image_directory):
 
             image_path = os.path.join(dirpath, filename)
             try:
-                with open(os.path.join(dirpath, os.path.splitext(filename)[0]+'.json'), 'r', encoding='utf-8') as file:
-                    image_meta_json = json.load(file)
+                with open(os.path.join(dirpath, os.path.splitext(filename)[0]+'.yaml'), 'r', encoding='utf-8') as file:
+                    image_meta_json = yaml.safe_load(file)
             except FileNotFoundError as e:
                 print(f"Warning: Could not find file {e.filename}. Continuing with the next file.")
                 continue  # Skip to the next iteration of the loop, effectively ignoring the missing file
@@ -306,7 +305,7 @@ for dirpath, dirnames, filenames in os.walk(args.image_directory):
                 image_meta_json.setdefault('expert_list', {})
                 image_meta_json['expert_list'][expert_name] = returned_message
 
-                json_path = os.path.splitext(image_path)[0] + '.json'
-                with open(json_path, 'w') as json_file:
-                    json.dump(image_meta_json, json_file, cls=NumpyEncoder, indent=4)
-                print(f"Saved combined results to {json_path}.")
+                yaml_path = os.path.splitext(image_path)[0] + '.yaml'
+                with open(yaml_path, 'w') as yaml_file:
+                    json.dump(image_meta_json, yaml_file, indent=4)
+                print(f"Saved combined results to {yaml_path}.")

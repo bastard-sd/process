@@ -5,29 +5,29 @@ import shutil
 import subprocess
 import uuid
 import argparse
-import json
+import yaml
 from advcaption.taggers import ImageTagger
 import json
 from advcaption.nlp import load_model as loadmodel, loadinflectmodel, process_input_tags
 
-class NumpyEncoder(json.JSONEncoder):
-    """ Custom encoder for numpy data types """
-    def default(self, obj):
-        if isinstance(obj, np.integer):
-            return int(obj)
-        elif isinstance(obj, np.floating):
-            return float(obj)
-        elif isinstance(obj, np.ndarray):
-            return obj.tolist()
-        else:
-            return super(NumpyEncoder, self).default(obj)
+# class NumpyEncoder(json.JSONEncoder):
+#     """ Custom encoder for numpy data types """
+#     def default(self, obj):
+#         if isinstance(obj, np.integer):
+#             return int(obj)
+#         elif isinstance(obj, np.floating):
+#             return float(obj)
+#         elif isinstance(obj, np.ndarray):
+#             return obj.tolist()
+#         else:
+#             return super(NumpyEncoder, self).default(obj)
 
-def copy_template_to_image_directory(image_directory, template_file='./template_boilerplate.json'):
+def copy_template_to_image_directory(image_directory, template_file='./templates/template.yaml'):
     """
-    Copies the template JSON file './template_boilerplate.json' into the specified image directory.
+    Copies the template yaml file './templates/template.yaml' into the specified image directory.
 
     Parameters:
-    - image_directory: The path to the directory where the template JSON file will be copied.
+    - image_directory: The path to the directory where the template YAML file will be copied.
     """
 
     # Check if the image directory exists
@@ -37,7 +37,7 @@ def copy_template_to_image_directory(image_directory, template_file='./template_
     
     # Check if the template file exists
     if not os.path.isfile(template_file):
-        print("Template file './template_boilerplate.json' does not exist.")
+        print("Template file './templates/template.yaml' does not exist.")
         return
     
     # Construct the destination path for the template file in the image directory
@@ -48,14 +48,17 @@ def copy_template_to_image_directory(image_directory, template_file='./template_
     
     print(f"Template file copied to {destination_path}.")
     
-    # Load the JSON content into a dictionary
+    # Load the YAML content into a dictionary
     try:
         with open(destination_path, 'r') as file:
-            template_data = json.load(file)
-            print("Template JSON loaded into dictionary.")
+            template_data = yaml.safe_load(file)
+            print("Template YAML loaded into dictionary.")
             return template_data
-    except json.JSONDecodeError as e:
-        print(f"Error loading JSON from template file: {e}")
+    # except json.JSONDecodeError as e:
+    #     print(f"Error loading JSON from template file: {e}")
+    #     return None
+    except yaml.YAMLError:
+        print(f"Error loading YAML from template file: {e}")
         return None
 
 def load_image(image_path, error_directory):
@@ -160,12 +163,12 @@ for dirpath, dirnames, filenames in os.walk(args.image_directory):
 
 renamed_filelist = rename_files_in_directory(args.image_directory, rename=args.rename)
 
-template_file = os.path.join(args.image_directory, 'template.json')
+template_file = os.path.join(args.image_directory, './templates.yaml')
 if os.path.exists(template_file):
     try:
         with open(template_file, 'r', encoding='utf-8') as file:
-            template_data = json.load(file)
-            print("Template JSON loaded into dictionary.")
+            template_data = yaml.safe_load(file)
+            print("Template YAML loaded into dictionary.")
             config = template_data
     except Exception as e:
         print(f"Failed to load template: {e}")
@@ -184,27 +187,28 @@ inflect_model = loadinflectmodel()
 for filename in renamed_filelist:
     print(filename)
 
-    # Check if a corresponding JSON file already exists
-    json_path = os.path.splitext(filename)[0] + '.json'
-    if os.path.exists(json_path):
-        print(f"JSON file already exists for {filename}. Skipping.")
+    # Check if a corresponding YAML file already exists
+    yaml_path = os.path.splitext(filename)[0] + '.yaml'
+    if os.path.exists(yaml_path):
+        print(f"YAML file already exists for {filename}. Skipping.")
         continue
 
-    # Proceed with processing the image if no JSON file exists
+    # Proceed with processing the image if no YAML file exists
     if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.bmp', '.gif', '.tiff', '.webp', '.webm')):
         image_path = filename
+        print('process_image')
         combined_results = processor.process_image(image_path)
         
-        try:
-            fully_processed_prompt = process_input_tags(spacy_model, inflect_model, [], combined_results['general'])
-            combined_results['processed'] = fully_processed_prompt
-        except Exception as e:
-            print(f"Error processing tags for {filename}: {e}. Skipping this step.")
-            print(f"Moving {filename} to error directory.")
-            shutil.move(image_path, os.path.join(args.error_directory, os.path.basename(filename)))
-            # Optionally, you can decide to continue, break, or take any specific action here
-            continue  # or use 'break' to stop the loop, or 'pass' to do nothing further
+        # try:
+        #     fully_processed_prompt = process_input_tags(spacy_model, inflect_model, [], combined_results['general'])
+        #     combined_results['processed'] = fully_processed_prompt
+        # except Exception as e:
+        #     print(f"Error processing tags for {filename}: {e}. Skipping this step.")
+        #     print(f"Moving {filename} to error directory.")
+        #     shutil.move(image_path, os.path.join(args.error_directory, os.path.basename(filename)))
+        #     # Optionally, you can decide to continue, break, or take any specific action here
+        #     continue  # or use 'break' to stop the loop, or 'pass' to do nothing further
 
-        with open(json_path, 'w') as json_file:
-            json.dump(combined_results, json_file, cls=NumpyEncoder, indent=4)
-        print(f"Saved combined results to {json_path}.")
+        with open(yaml_path, 'w') as yaml_file:
+            yaml.dump(combined_results, yaml_file, allow_unicode=True, default_flow_style=False, indent=4)
+        print(f"Saved combined results to {yaml_path}.")
