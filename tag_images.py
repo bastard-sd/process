@@ -32,17 +32,24 @@ def copy_template_to_image_directory(image_directory, template_file='./templates
 
     if not os.path.isdir(image_directory):
         print(f"The directory {image_directory} does not exist.")
-        return
+        return {}
     
     if not os.path.isfile(template_file):
         print("Template file './templates/template.yaml' does not exist.")
-        return
+        return {}
     
     destination_path = os.path.join(image_directory, os.path.basename(template_file))
     
     if os.path.isfile(destination_path):
         print(f"Template file already exists at {destination_path}.")
-        return
+        try:
+            with open(destination_path, 'r') as file:
+                template_data = yaml.safe_load(file)
+                print("Template YAML loaded into dictionary.")
+                return template_data
+        except yaml.YAMLError as e:
+            print(f"Error loading YAML from template file: {e}")
+            return {}
     
     shutil.copy(template_file, destination_path)
     print(f"Template file copied to {destination_path}.")
@@ -53,7 +60,7 @@ def copy_template_to_image_directory(image_directory, template_file='./templates
             return template_data
     except yaml.YAMLError as e:
         print(f"Error loading YAML from template file: {e}")
-        return None
+        return {}
 
 def load_image(image_path, error_directory):
     try:
@@ -166,6 +173,7 @@ if os.path.exists(template_file):
             config = template_data
     except Exception as e:
         print(f"Failed to load template: {e}")
+        config = {}
 else:
     config = copy_template_to_image_directory(args.image_directory)
 
