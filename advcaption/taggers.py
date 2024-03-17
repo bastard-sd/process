@@ -11,7 +11,7 @@ NETWORKS_DIR = "./networks"
 MOAT_MODEL_REPO = "moat"
 SWIN_MODEL_REPO = "swin"
 CONV_MODEL_REPO = "conv"
-VIT_MODEL_REPO = "tag"
+VIT_MODEL_REPO = "vit"
 MODEL_FILENAME = "model.onnx"
 LABEL_FILENAME = "selected_tags.csv"
 
