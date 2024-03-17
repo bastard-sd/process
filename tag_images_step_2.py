@@ -11,7 +11,6 @@ import io
 # Adapted from OpenAI's Vision example 
 from openai import OpenAI
 import base64
-import demYAML3
 import yaml
 
 # Point to the local server
