@@ -192,17 +192,18 @@ parser.add_argument("--default_template", help="Choose the template file to use 
 parser.add_argument("--skipconcept", action="store_true", help="Skip adding a customized concept per subdirectory.")
 args = parser.parse_args()
 
-
+print('args.image_directory')
+print(args.image_directory)
+config = load_or_initialize_template(args.image_directory, args.default_template)
+print('YAML Config')
+print(config)
 
 for dirpath, dirnames, filenames in os.walk(args.image_directory):
     for filename in filenames:
         if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.bmp', '.gif', '.tiff', '.webp', '.webm')):
             image_path = os.path.join(dirpath, filename)
             print(f"Processing file: {image_path}")
-            config = load_or_initialize_template(dirpath, args.default_template)
 
-            print('YAML Config')
-            print(config)
             try:
                 with open(os.path.join(dirpath, os.path.splitext(filename)[0]+'.yaml'), 'r', encoding='utf-8') as file:
                     image_meta_yaml = yaml.safe_load(file)
