@@ -8,6 +8,7 @@ import pandas as pd
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 NETWORKS_DIR = "./networks"
+Z3D_MODEL_REPO = "z3d"
 MOAT_MODEL_REPO = "moat"
 SWIN_MODEL_REPO = "swin"
 CONV_MODEL_REPO = "conv"
@@ -16,12 +17,14 @@ MODEL_FILENAME = "model.onnx"
 LABEL_FILENAME = "selected_tags.csv"
 
 MODEL_PATHS = {
+    'z3d': os.path.join(NETWORKS_DIR, Z3D_MODEL_REPO, MODEL_FILENAME),
     'moat': os.path.join(NETWORKS_DIR, MOAT_MODEL_REPO, MODEL_FILENAME),
     'swin': os.path.join(NETWORKS_DIR, SWIN_MODEL_REPO, MODEL_FILENAME),
     'conv': os.path.join(NETWORKS_DIR, CONV_MODEL_REPO, MODEL_FILENAME),
     'vit': os.path.join(NETWORKS_DIR, VIT_MODEL_REPO, MODEL_FILENAME),
 }
 MODEL_LABEL_PATHS = {
+    'z3d': os.path.join(NETWORKS_DIR, Z3D_MODEL_REPO, LABEL_FILENAME),
     'moat': os.path.join(NETWORKS_DIR, MOAT_MODEL_REPO, LABEL_FILENAME),
     'swin': os.path.join(NETWORKS_DIR, SWIN_MODEL_REPO, LABEL_FILENAME),
     'conv': os.path.join(NETWORKS_DIR, CONV_MODEL_REPO, LABEL_FILENAME),
@@ -34,6 +37,7 @@ class ImageTagger:
         self.ratio_threshold = ratio_threshold
         self.character_threshold = character_threshold
         self.models = {
+            "z3d": None,
             "moat": None,
             "swin": None,
             "conv": None,
@@ -62,6 +66,10 @@ class ImageTagger:
         return img
 
     def make_square(self, img, target_size):
+        if img is None:
+            print("Image not loaded correctly")
+        else:
+            print("Image loaded successfully")
         old_size = img.shape[:2]
         desired_size = max(old_size)
         desired_size = max(desired_size, target_size)

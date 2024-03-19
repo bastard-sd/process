@@ -158,10 +158,6 @@ for dirpath, dirnames, filenames in os.walk(args.image_directory):
             image_path = os.path.join(dirpath, filename)
             _ = load_image(image_path, args.error_directory)
 
-# Validate Part 2
-# validate_images_imagemagick(args.image_directory, args.error_directory)
-
-
 renamed_filelist = rename_files_in_directory(args.image_directory, rename=args.rename)
 
 template_file = os.path.join(args.image_directory, './templates.yaml')
