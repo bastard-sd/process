@@ -68,10 +68,8 @@ class ImageTagger:
     def make_square(self, img, target_size):
         if img is None:
             print("Image not loaded correctly")
-        else:
-            print("Image loaded successfully")
         old_size = img.shape[:2]
-        desired_size = max(old_size)
+        desired_size = max(old_size, default=0)
         desired_size = max(desired_size, target_size)
         delta_w = desired_size - old_size[1]
         delta_h = desired_size - old_size[0]
