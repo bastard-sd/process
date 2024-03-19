@@ -148,6 +148,7 @@ parser = argparse.ArgumentParser(description="Process images in a directory.")
 parser.add_argument("--image_directory", help="The directory containing images to process.")
 parser.add_argument("--error_directory", help="The directory where error images will be moved.")
 parser.add_argument("--rename", action="store_true", help="Enable renaming of error images.")
+parser.add_argument("--overwrite", action="store_true", help="Overwrite the tags from a previous run.")
 args = parser.parse_args()
 
 # Validate Part 1
@@ -186,10 +187,10 @@ for filename in renamed_filelist:
 
     # Check if a corresponding YAML file already exists
     yaml_path = os.path.splitext(filename)[0] + '.yaml'
-    if os.path.exists(yaml_path):
+    if os.path.exists(yaml_path) and args.overwrite == False:
         print(f"YAML file already exists for {filename}. Skipping.")
         continue
-
+    
     # Proceed with processing the image if no YAML file exists
     if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.bmp', '.gif', '.tiff', '.webp', '.webm')):
         image_path = filename

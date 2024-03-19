@@ -16,7 +16,7 @@ import yaml
 # Point to the local server
 client = OpenAI(base_url="http://localhost:1234/v1", api_key="not-needed")
 
-def load_or_initialize_template(dirpath, default_template_path='./template/template.yaml'):
+def load_or_initialize_template(dirpath, backup_dirpath, default_template_path='./template/template.yaml'):
     """
     Loads a template YAML file from the specified directory. If it doesn't exist,
     copies a default template into the directory, updates its 'llm_config'->'concept_focus'
@@ -31,10 +31,15 @@ def load_or_initialize_template(dirpath, default_template_path='./template/templ
     """
     template_file = os.path.join(dirpath, 'template.yaml')
 
-    # Check if the specific template.yaml file exists in the directory
     if not os.path.isfile(template_file):
-        print(f"'{template_file}' does not exist. Using default template instead.")
-        template_file = default_template_path
+        print(f"'{template_file}' does not exist. Using backup template instead.")
+        template_file = os.path.join(backup_dirpath, 'template.yaml')
+        if not os.path.isfile(template_file):
+            print(f"'{template_file}' does not exist. Using default template instead.")
+            template_file = default_template_path
+        else:
+            template_file = backup_dirpath
+            print(f"Found '{template_file}'. Loading...")
     else:
         print(f"Found '{template_file}'. Loading...")
 
@@ -192,18 +197,14 @@ parser.add_argument("--default_template", help="Choose the template file to use 
 parser.add_argument("--skipconcept", action="store_true", help="Skip adding a customized concept per subdirectory.")
 args = parser.parse_args()
 
-print('args.image_directory')
-print(args.image_directory)
-config = load_or_initialize_template(args.image_directory, args.default_template)
-print('YAML Config')
-print(config)
-
 for dirpath, dirnames, filenames in os.walk(args.image_directory):
     for filename in filenames:
         if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.bmp', '.gif', '.tiff', '.webp', '.webm')):
             image_path = os.path.join(dirpath, filename)
             print(f"Processing file: {image_path}")
 
+            config = load_or_initialize_template(dirpath, args.image_directory, args.default_template)
+            
             try:
                 with open(os.path.join(dirpath, os.path.splitext(filename)[0]+'.yaml'), 'r', encoding='utf-8') as file:
                     image_meta_yaml = yaml.safe_load(file)

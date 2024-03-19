@@ -99,8 +99,15 @@ class ImageTagger:
         df = pd.read_csv(path)
         tag_names = df["name"].tolist()
         rating_indexes = list(np.where(df["category"] == 9)[0])
+        
         general_indexes = list(np.where(df["category"] == 0)[0])
+        species_indexes = list(np.where(df["category"] == 5)[0])
+        meta_indexes = list(np.where(df["category"] == 7)[0])
+        lore_indexes = list(np.where(df["category"] == 8)[0])
+        
         character_indexes = list(np.where(df["category"] == 4)[0])
+        copyright_indexes = list(np.where(df["category"] == 3)[0])
+        artist_indexes = list(np.where(df["category"] == 1)[0])
         return tag_names, rating_indexes, general_indexes, character_indexes
 
     def predict(self, raw_image: Image, image: np.ndarray, model_name: str, path: str):
@@ -122,6 +129,7 @@ class ImageTagger:
         probs = model.run([label_name], {input_name: img_th})[0]
         labels = list(zip(tag_names, probs[0].astype(float)))
 
+        print(2)
         # Process prediction results
         # rating = {tag_names[i]: probs[0][i] for i in rating_indexes}
         highest_prob_index = max(rating_indexes, key=lambda i: probs[0][i])
@@ -129,6 +137,7 @@ class ImageTagger:
         general = {tag_names[i]: probs[0][i] for i in general_indexes if probs[0][i] > self.tag_threshold}
         character = {tag_names[i]: probs[0][i] for i in character_indexes if probs[0][i] > self.character_threshold}
 
+        print(3)
         return {
             'model': model_name,
             'rating': tag_names[highest_prob_index],
