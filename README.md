@@ -11,6 +11,21 @@ git clone https://huggingface.co/SmilingWolf/wd-convnext-tagger-v3 conv
 git clone https://huggingface.co/SmilingWolf/wd-swinv2-tagger-v3 swin
 git clone https://huggingface.co/SmilingWolf/wd-vit-tagger-v3 vit
 git clone https://huggingface.co/SmilingWolf/wd-v1-4-moat-tagger-v2 moat
+mkdir mldb
+```
+
+```
+cd .\network\mldb\
+Invoke-WebRequest -Uri "https://huggingface.co/deepghs/ml-danbooru-onnx/blob/main/ml_caformer_m36_dec-5-97527.onnx" -OutFile ".\ml_caformer_m36_dec-5-97527.onnx"
+Invoke-WebRequest -Uri "https://huggingface.co/deepghs/ml-danbooru-onnx/resolve/main/TResnet-D-FLq_ema_6-30000.onnx" -OutFile ".\TResnet-D-FLq_ema_6-30000.onnx"
+Invoke-WebRequest -Uri "https://huggingface.co/deepghs/ml-danbooru-onnx/blob/main/classes.json" -OutFile ".\classes.json"
+```
+or 
+```
+cd .\network\mldb\
+curl -o ml_caformer_m36_dec-5-97527.onnx "https://huggingface.co/deepghs/ml-danbooru-onnx/blob/main/ml_caformer_m36_dec-5-97527.onnx"
+curl -o TResnet-D-FLq_ema_6-30000.onnx "https://huggingface.co/deepghs/ml-danbooru-onnx/resolve/main/TResnet-D-FLq_ema_6-30000.onnx"
+curl -o classes.json "https://huggingface.co/deepghs/ml-danbooru-onnx/blob/main/classes.json"
 ```
 
 ```
