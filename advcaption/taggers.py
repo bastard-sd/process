@@ -108,13 +108,13 @@ class ImageTagger:
         character_indexes = list(np.where(df["category"] == 4)[0])
         copyright_indexes = list(np.where(df["category"] == 3)[0])
         artist_indexes = list(np.where(df["category"] == 1)[0])
-        return tag_names, rating_indexes, general_indexes, character_indexes
+        return (tag_names, rating_indexes, general_indexes, species_indexes, meta_indexes, lore_indexes, character_indexes, copyright_indexes, artist_indexes)
 
-    def predict(self, raw_image: Image, image: np.ndarray, model_name: str, path: str):
+    def predict(self, raw_image: Image, image: np.ndarray, model_name: str, path: str, include_species=False):
         model = self.models[model_name]
         input_name = model.get_inputs()[0].name
         label_name = model.get_outputs()[0].name
-        tag_names, rating_indexes, general_indexes, character_indexes = self.load_labels(path)
+        tag_names, rating_indexes, general_indexes, species_indexes, meta_indexes, lore_indexes, character_indexes, copyright_indexes, artist_indexes = self.load_labels(path)
 
         # Prepare image for model prediction
         _, height, width, _ = model.get_inputs()[0].shape
@@ -123,26 +123,33 @@ class ImageTagger:
         img_th = img_th.astype(np.float32)
         img_th = np.expand_dims(img_th, 0)  # Add batch dimension
 
-
-        print(1)
         # Perform prediction
         probs = model.run([label_name], {input_name: img_th})[0]
         labels = list(zip(tag_names, probs[0].astype(float)))
 
-        print(2)
         # Process prediction results
         # rating = {tag_names[i]: probs[0][i] for i in rating_indexes}
         highest_prob_index = max(rating_indexes, key=lambda i: probs[0][i])
         
         general = {tag_names[i]: probs[0][i] for i in general_indexes if probs[0][i] > self.tag_threshold}
+        species = {tag_names[i]: probs[0][i] for i in species_indexes if probs[0][i] > self.tag_threshold}
+        meta = {tag_names[i]: probs[0][i] for i in meta_indexes if probs[0][i] > self.tag_threshold}
+        # general = {tag_names[i]: probs[0][i] for i in lore_indexes if probs[0][i] > self.tag_threshold}
+        if include_species:
+            combined_general_info = {**general, **species, **meta}
+        else: 
+            combined_general_info = {**general, **meta}
+        
         character = {tag_names[i]: probs[0][i] for i in character_indexes if probs[0][i] > self.character_threshold}
-
-        print(3)
+        copyright = {tag_names[i]: probs[0][i] for i in copyright_indexes if probs[0][i] > self.character_threshold}
+        artist = {tag_names[i]: probs[0][i] for i in artist_indexes if probs[0][i] > self.character_threshold}
+        combined_character_info = {**character, **copyright, **artist}
+        
         return {
             'model': model_name,
             'rating': tag_names[highest_prob_index],
-            'general': general,
-            'character': character,
+            'general': combined_general_info,
+            'character': combined_character_info,
         }
 
     def combine_dicts(self, results):
@@ -180,7 +187,7 @@ class ImageTagger:
         
         return combined_result
 
-    def process_image(self, img_path):
+    def process_image(self, img_path, beast_mode):
         raw_image = Image.open(img_path).convert("RGBA")
         new_image = Image.new("RGBA", raw_image.size, "WHITE")  # Convert alpha to white
         new_image.paste(raw_image, mask=raw_image)
@@ -190,7 +197,11 @@ class ImageTagger:
         for model_name in self.models.keys():
             path = MODEL_LABEL_PATHS[model_name]
             print(model_name)
-            result = self.predict(raw_image, image, model_name, path)
+            include_species = True if beast_mode else False
+            if not include_species and model_name == 'z3d':
+                continue
+            
+            result = self.predict(raw_image, image, model_name, path, include_species=include_species)
             result_tags.append(result)
 
         combined_results = self.combine_dicts(result_tags)

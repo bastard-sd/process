@@ -147,6 +147,7 @@ def generate_unique_id(length=8):
 parser = argparse.ArgumentParser(description="Process images in a directory.")
 parser.add_argument("--image_directory", help="The directory containing images to process.")
 parser.add_argument("--error_directory", help="The directory where error images will be moved.")
+parser.add_argument("--beast", action="store_true", help="Use z3d Tagger for furry concepts.")
 parser.add_argument("--rename", action="store_true", help="Enable renaming of error images.")
 parser.add_argument("--overwrite", action="store_true", help="Overwrite the tags from a previous run.")
 args = parser.parse_args()
@@ -193,9 +194,8 @@ for filename in renamed_filelist:
     
     # Proceed with processing the image if no YAML file exists
     if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.bmp', '.gif', '.tiff', '.webp', '.webm')):
-        image_path = filename
         try:
-            combined_results = processor.process_image(image_path)
+            combined_results = processor.process_image(filename, args.beast)
             # try:
             #     fully_processed_prompt = process_input_tags(spacy_model, inflect_model, [], combined_results['general'])
             #     combined_results['processed'] = fully_processed_prompt
@@ -211,4 +211,4 @@ for filename in renamed_filelist:
                 yaml.dump(combined_results, yaml_file, allow_unicode=True, default_flow_style=False, indent=4)
             print(f"Saved combined results to {yaml_path}.")
         except Exception as e:  # Catching a general exception to handle any kind of failure in process_image
-            print(f"Failed to process image {image_path}. Error: {e}")
+            print(f"Failed to process image {filename}. Error: {e}")
