@@ -32,16 +32,12 @@ MODEL_LABEL_PATHS = {
 }
 
 class ImageTagger:
-    def __init__(self, tag_threshold=0.35, ratio_threshold=0.1, character_threshold=0.85):
+    def __init__(self, model='vit', tag_threshold=0.35, ratio_threshold=0.1, character_threshold=0.85):
         self.tag_threshold = tag_threshold
         self.ratio_threshold = ratio_threshold
         self.character_threshold = character_threshold
         self.models = {
-            "z3d": None,
-            "moat": None,
-            "swin": None,
-            "conv": None,
-            "vit": None,
+            model: None
         }
         self.load_all_tagger_models()
 
@@ -91,8 +87,10 @@ class ImageTagger:
         return model
 
     def load_all_tagger_models(self):
-        for name, path in MODEL_PATHS.items():
-            self.models[name] = self.load_tagger_model(path)
+        print( self.models)
+        for name in self.models.keys():
+            print(name)
+            self.models[name] = self.load_tagger_model(MODEL_PATHS[name])
 
     def load_labels(self, path) -> tuple[list[str], list[int], list[int], list[int]]:
         # LABEL_FILENAME = "selected_tags.csv"
