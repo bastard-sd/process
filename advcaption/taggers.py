@@ -87,9 +87,7 @@ class ImageTagger:
         return model
 
     def load_all_tagger_models(self):
-        print( self.models)
         for name in self.models.keys():
-            print(name)
             self.models[name] = self.load_tagger_model(MODEL_PATHS[name])
 
     def load_labels(self, path) -> tuple[list[str], list[int], list[int], list[int]]:
@@ -127,8 +125,12 @@ class ImageTagger:
 
         # Process prediction results
         # rating = {tag_names[i]: probs[0][i] for i in rating_indexes}
-        highest_prob_index = max(rating_indexes, key=lambda i: probs[0][i])
-        
+        if rating_indexes:
+            highest_prob_index = max(rating_indexes, key=lambda i: probs[0][i])
+            rating = tag_names[highest_prob_index]
+        else:
+            rating = {}
+            
         general = {tag_names[i]: probs[0][i] for i in general_indexes if probs[0][i] > self.tag_threshold}
         species = {tag_names[i]: probs[0][i] for i in species_indexes if probs[0][i] > self.tag_threshold}
         meta = {tag_names[i]: probs[0][i] for i in meta_indexes if probs[0][i] > self.tag_threshold}
@@ -145,7 +147,7 @@ class ImageTagger:
         
         return {
             'model': model_name,
-            'rating': tag_names[highest_prob_index],
+            'rating': rating,
             'general': combined_general_info,
             'character': combined_character_info,
         }
