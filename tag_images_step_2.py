@@ -38,7 +38,6 @@ def load_or_initialize_template(dirpath, backup_dirpath, default_template_path='
             print(f"'{template_file}' does not exist. Using default template instead.")
             template_file = default_template_path
         else:
-            template_file = backup_dirpath
             print(f"Found '{template_file}'. Loading...")
     else:
         print(f"Found '{template_file}'. Loading...")
