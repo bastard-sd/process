@@ -29,16 +29,22 @@ curl -o classes.json "https://huggingface.co/deepghs/ml-danbooru-onnx/blob/main/
 ```
 
 ```
-copy 'template_boilerplate.json' into the image directory you are captioning
-rename it 'template.json'
+copy 'templat.yaml' into the image directory you are captioning
 customize it if necessary.
 ```
 
+Tag with CLI
 ```
 python .\tag_images.py --image_directory=\path\to\images --error_directory=\path\to\errors
 python .\tag_images_step_2.py --image_directory=\path\to\images
 ```
 
+Tag Server
+```
+python .\wd14_tagger_api\server.py > ./logs/server.log
+```
+
+LLM Server
 ```
 CMAKE_ARGS="-DLLAMA_CUBLAS=on" FORCE_CMAKE=1 pip install --upgrade --force-reinstall llama-cpp-python --no-cache-dir
 
