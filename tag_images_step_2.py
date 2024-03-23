@@ -16,7 +16,7 @@ import yaml
 # Point to the local server
 client = OpenAI(base_url="http://localhost:1234/v1", api_key="not-needed")
 
-def load_or_initialize_template(dirpath, backup_dirpath, default_template_path='./templates/template.yaml'):
+def load_or_initialize_template(dirpath, backup_dirpath, default_template_path='./template/template.yaml'):
     """
     Loads a template YAML file from the specified directory. If it doesn't exist,
     copies a default template into the directory, updates its 'llm_config'->'concept_focus'
@@ -54,6 +54,19 @@ def load_or_initialize_template(dirpath, backup_dirpath, default_template_path='
     # Return the updated template data
     return template_data
 
+
+# class NumpyEncoder(YAML.YAMLEncoder):
+#     """ Custom encoder for numpy data types """
+#     def default(self, obj):
+#         if isinstance(obj, np.integer):
+#             return int(obj)
+#         elif isinstance(obj, np.floating):
+#             return float(obj)
+#         elif isinstance(obj, np.ndarray):
+#             return obj.tolist()
+#         else:
+#             return super(NumpyEncoder, self).default(obj)
+
 def copy_template_to_image_directory(image_directory, template_file='./templates/template.yaml'):
     """
     Copies the template YAML file './templates.yaml' into the specified image directory.
@@ -69,7 +82,7 @@ def copy_template_to_image_directory(image_directory, template_file='./templates
     
     # Check if the template file exists
     if not os.path.isfile(template_file):
-        print(f"Template file {template_file} does not exist.")
+        print("Template file './templates.yaml' does not exist.")
         return
     
     # Construct the destination path for the template file in the image directory
@@ -163,6 +176,19 @@ def generate_unique_id(length=8):
     
     return unique_id_short
 
+
+
+
+## system prompt
+## expert list
+## default message 'Describe this image using your template AND all of the system prompt instructions.'
+## expert attachment to the message
+## 
+
+
+
+
+
 parser = argparse.ArgumentParser(description="Process images in a directory.")
 parser.add_argument("--image_directory", help="The directory containing images to process.")
 parser.add_argument("--overwrite", action="store_true", help="Overwrite the LLM captions from a previous run.")
@@ -237,32 +263,33 @@ for dirpath, dirnames, filenames in os.walk(args.image_directory):
                 print("Couldn't read the image. Make sure the path is correct and the file exists.")
                 continue
 
-            for expert_path in expert_list: 
-                yaml_path = os.path.splitext(image_path)[0] + '.yaml'
+            for expert_path in expert_list:
                 with open(os.path.join('.','prompts',expert_path), 'r') as file:
-                    expert_data = yaml.load(file, Loader=yaml.Loader)
+                    expert_data = yaml.safe_load(file)
                     
                 expert_name = expert_data['expert_name']
+                expert_system_prompt = expert_data['expert_system_prompt']
+                expert_conversation_prompt = expert_data['expert_conversation_prompt']
 
-                expert_system_append = expert_name + '\n' + expert_data['expert_system_prompt']
-                convo_prompt = chat_prompt + '\n' + expert_data['expert_conversation_prompt']
-                template = expert_system_append + '\nCONCEPT_FOCUS: ' + concept_focus + '\nTAG_FILE: ' + ", ".join(image_meta_yaml['tags']['combined']['general'].keys())
-                
+                expert_system_append = expert_name + '\n' + expert_system_prompt
+
                 if args.skipconcept:
-                    template = expert_system_append + '\nTAG_FILE: ' + ", ".join(image_meta_yaml['tags']['combined']['general'].keys())
-                    
-                if expert_data['include_expert_context']:
-                    with open(yaml_path, 'r') as yaml_file:
-                        loaded_image_yaml = yaml.load(yaml_file, Loader=yaml.Loader)
-                    expert_testimonies = []
-                    for expname, testimony in loaded_image_yaml['expert_list'].items():
-                        expert_testimonies.append(expname + '\n' + testimony[0])
-                    expert_testimonies = '\n\n'.join(expert_testimonies)
-                    convo_prompt = chat_prompt + '\n' + expert_testimonies + '\n' + expert_data['expert_conversation_prompt']
+                    template = expert_system_append + '\TAG_FILE: ' + image_meta_yaml['general']
+                else:
+                    template = expert_system_append + '\nCONCEPT_FOCUS: ' + concept_focus + '\TAG_FILE: ' + image_meta_yaml['general']
 
-                message_count = 0
-                returned_messages = []
-                while message_count < expert_data['count']:
+                system_prompt_combined = system_prompt + template
+                print('system_prompt_combined')
+                print(system_prompt_combined)
+                print('chat_prompt')
+                print(chat_prompt)
+                print('expert_conversation_prompt')
+                print(expert_conversation_prompt)
+                
+                
+                try_again = True
+                temp_modifier = 0.0
+                while try_again:
                     completion = client.chat.completions.create(
                         model="local-model", # not used
                         messages=[
@@ -273,7 +300,7 @@ for dirpath, dirnames, filenames in os.walk(args.image_directory):
                         {
                             "role": "user",
                             "content": [
-                            {"type": "text", "text": convo_prompt},
+                            {"type": "text", "text": chat_prompt + expert_conversation_prompt},
                             {
                                 "type": "image_url",
                                 "image_url": {
@@ -283,18 +310,21 @@ for dirpath, dirnames, filenames in os.walk(args.image_directory):
                             ],
                         }
                         ],
-                        max_tokens=expert_data['context_length'],
+                        max_tokens=32000,
                         stream=False,
-                        temperature=0.4,
+                        temperature=0.2 + temp_modifier,
                         presence_penalty=1.2,
                         top_p=0.95
                     )
-                    message_count += 1
-                    returned_messages.append(completion.choices[0].message.content)
+                    
+                    returned_message = completion.choices[0].message.content
+                    try_again = False
+                    temp_modifier += 0.01
                     
                 image_meta_yaml.setdefault('expert_list', {})
-                image_meta_yaml['expert_list'][expert_name] = returned_messages
+                image_meta_yaml['expert_list'][expert_name] = returned_message
 
-                with open(yaml_path, 'w', encoding='utf-8') as yaml_file:
+                yaml_path = os.path.splitext(image_path)[0] + '.yaml'
+                with open(yaml_path, 'w') as yaml_file:
                     yaml.dump(image_meta_yaml, yaml_file, allow_unicode=True, default_flow_style=False, indent=4)
-                print(f"Saved {expert_name} results to {yaml_path}.")
+                print(f"Saved combined results to {yaml_path}.")
