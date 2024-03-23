@@ -39,6 +39,10 @@ python .\tag_images.py --image_directory=\path\to\images --error_directory=\path
 python .\tag_images_step_2.py --image_directory=\path\to\images
 ```
 
+```
+python -m llama_cpp.server --config_file ./llm_api/server.json
+```
+
 # Troubleshooting
 If you see `UserWarning: Specified provider 'CUDAExecutionProvider' is not in available provider names.Available providers: 'AzureExecutionProvider, CPUExecutionProvider'`
 Do the following

@@ -1,0 +1,76 @@
+vit:
+  activate: false
+  model: wd14-vit.v3
+  device: cuda
+  threshold: 0.8
+  additional_tags: []
+  exclude_tags: []
+  sort_by_alphabetical_order: false
+  add_confident_as_weight: false
+  replace_underscore: true
+  replace_underscore_excludes: []
+  escape_tag: false
+
+conv:
+  activate: true
+  model: wd14-convnext.v3
+  device: cuda
+  threshold: 0.3
+  additional_tags: []
+  exclude_tags: []
+  sort_by_alphabetical_order: false
+  add_confident_as_weight: false
+  replace_underscore: true
+  replace_underscore_excludes: []
+  escape_tag: false
+
+swin:
+  activate: true
+  model: wd14-swin.v3
+  device: cuda
+  threshold: 0.5
+  additional_tags: []
+  exclude_tags: []
+  sort_by_alphabetical_order: false
+  add_confident_as_weight: false
+  replace_underscore: true
+  replace_underscore_excludes: []
+  escape_tag: false
+
+moat:
+  activate: true
+  model: wd14-moat.v2
+  device: cuda
+  threshold: 0.5
+  additional_tags: []
+  exclude_tags: []
+  sort_by_alphabetical_order: false
+  add_confident_as_weight: false
+  replace_underscore: true
+  replace_underscore_excludes: []
+  escape_tag: false
+
+z3d:
+  activate: false
+  model: wd14-z3d.v2
+  device: cuda
+  threshold: 0.6
+  additional_tags: []
+  exclude_tags: []
+  sort_by_alphabetical_order: false
+  add_confident_as_weight: false
+  replace_underscore: true
+  replace_underscore_excludes: []
+  escape_tag: false
+
+caf:
+  activate: true
+  model: mldb-caformer
+  device: cuda
+  threshold: 0.7
+
+tnd:
+  activate: true
+  model: mldb-tresnetd
+  device: cuda
+  threshold: 0.7

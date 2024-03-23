@@ -283,6 +283,8 @@ for dirpath, dirnames, filenames in os.walk(args.image_directory):
                 print(system_prompt_combined)
                 print('chat_prompt')
                 print(chat_prompt)
+                print('expert_conversation_prompt')
+                print(expert_conversation_prompt)
                 
                 
                 try_again = True

@@ -5,14 +5,41 @@ tagger_config:
 llm_config:
   concept_focus: "concept to emphasize with the picture"
   expert_list:
-    - "expert_narrator.yaml"
-    - "expert_photographer.yaml"
+    tags:
+      file: "tag_expert.yaml"
+      context_length: 64
+      count: 8
+    art:
+      file: "art_expert.yaml"
+      context_length: 64
+      count: 8
+    body:
+      file: "body_expert.yaml"
+      context_length: 64
+      count: 8
+    emotion:
+      file: "emotion_expert.yaml"
+      context_length: 64
+      count: 8
+    # technical:
+    #   file: "technical_expert.yaml"
+    #   context_length: 64
+    #   count: 8
+    # voyuer:
+    #   file: "voyuer_expert.yaml"
+    #   context_length: 64
+    #   count: 8
+    narration:
+      file: "narration_expert.yaml"
+      context: true
+      context_length: 256
+      count: 8
   system_prompt:
-    - "system_alignment.txt"
-    - "system_communication.txt"
-    - "system_engagement.txt"
-    - "system_chain_of_thought.txt"
+    - "system_alignment_v2.txt"
+    # - "system_communication.txt"
+    # - "system_engagement.txt"
+    # - "system_chain_of_thought.txt"
     - "system_concept_focus.txt"
-    - "system_banned_words.txt"
-    - "system_tag_clarification.txt"
+    # - "system_banned_words.txt"
+    # - "system_tag_clarification.txt"
   default_prompt: "default_prompt.txt"

@@ -1,0 +1,26 @@
+
+tagger_config:
+  tag_threshold: 0.35
+  character_threshold: 0.85
+
+llm_config:
+  concept_focus: "Furry or Anthro Female."
+  expert_list:
+    #- "tag_expert.yaml"
+    - "art_expert.yaml"
+    - "body_expert.yaml"
+    #- "emotion_expert.yaml"
+    #- "scenery_expert.yaml"
+    #- "technical_expert.yaml"
+    #- "voyuer_expert.yaml"
+    - "narration_expert.yaml"
+  system_prompt:
+    - "blank.txt"
+    #- "system_alignment.txt"
+    #- "system_communication.txt"
+    #- "system_engagement.txt"
+    #- "system_chain_of_thought.txt"
+    #- "system_concept_focus.txt"
+    #- "system_banned_words.txt"
+    #- "system_tag_clarification.txt"
+  default_prompt: "default_prompt.txt"

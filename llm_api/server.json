@@ -1,0 +1,47 @@
+{
+    "host": "0.0.0.0",
+    "port": 8080,
+    "models": [
+        {
+            "model": "H:/dev/llava_custom/ggml-model-f16.gguf",
+            "clip_model_path":"H:/dev/llava_custom/mmproj-model-f16-q6_k.gguf",
+            "model_alias": "gpt-3.5-turbo",
+            "chat_format": "llava-1-5",
+            "seed":-1,
+            "n_gpu_layers": -1,
+            "logits_all": true,
+            "offload_kqv": true,
+            "n_threads": 12,
+            "n_batch": 512,
+            "n_ctx": 4096
+        },
+        {
+            "model": "H:/dev/llava-v1.6-mistral-7b_gguf/ggml-mistral-7b-q_5_k.gguf",
+            "clip_model_path":"H:/dev/llava-v1.6-mistral-7b_gguf/mmproj-mistral7b-f16-q6_k.gguf",
+            "lora_path":"H:/dev/crestfallen_peft/ggml-adapter-model.bin",
+            "lora_base":"H:/dev/llava-v1.6-mistral-7b/ggml-model-f16.gguf",
+            "model_alias": "gpt-3.5-turbo",
+            "chat_format": "llava-1-5",
+            "seed":-1,
+            "n_gpu_layers": -1,
+            "logits_all": true,
+            "offload_kqv": true,
+            "n_threads": 12,
+            "n_batch": 512,
+            "n_ctx": 4096
+        },
+        {
+            "model": "H:/dev/llava-v1.6-yi-34b_gguf/ggml-yi-34b-f16-q_3_k.gguf",
+            "clip_model_path":"H:/dev/llava-v1.6-yi-34b_gguf/mmproj-llava-34b-f16-q6_k.gguf",
+            "model_alias": "gpt-3.5-turbo",
+            "chat_format": "llava-1-5",
+            "seed":-1,
+            "n_gpu_layers": -1,
+            "logits_all": true,
+            "offload_kqv": true,
+            "n_threads": 12,
+            "n_batch": 512,
+            "n_ctx": 4096
+        }
+    ]
+}
