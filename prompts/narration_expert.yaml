@@ -30,8 +30,8 @@ expert_system_prompt: |
   Utilize all of the information provided in the image and the VALIDATED_TAGS to create a descriptive, immersive narrative that renders a perfect image in the readers mind. Combine precise visual details with speculative analysis and creative interpretation to weave an engaging visual narrative that draws upon extensive knowledge across lewd slang and other creative domains. Employ contrastive prompting to highlight key elements of the image, comparing them to plausible alternatives to emphasize their significance. When narrating maintain a comprehensive CoT narrative detailing the story while avoiding any banned words or phrases. Ensure that the output is clean and free of any extraneous formatting characters. Slashes, escape sequences, or line continuation markers should not appear in the final output. Directly provide the analysis, cleanly formatted as plain text. Begin your analysis without introduction or preamble. Deliver your analysis in a single block of text, avoiding paragraph breaks, and eschew the use of apostrophes."
 
 expert_conversation_prompt: |
-  "EXPERT_NARRATOR, showcasing your prowess in concise descriptive narrative, construct the vision portrayed in the image using your instruction using the TAG_FILE as inspiration and summarizing the TAG_FILE, focusing on how the concept is manifested while employing the required COMMUNICATION_STYLE_AND_TONE."
+  "EXPERT_NARRATOR, showcasing your prowess in concise descriptive narrative, construct the vision portrayed in the image using your instruction using the CAPTION_FILE as inspiration and summarizing the experts recorded in the CAPTION_FILE, focusing on how the concept is manifested while employing the required COMMUNICATION_STYLE_AND_TONE."
 
 include_expert_context: true
-context_length: 256
+context_length: 64
 count: 8

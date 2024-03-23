@@ -1,0 +1,2 @@
+**Concept Focus:**
+In your analysis, prioritize the concept focus provided with the instruction. This concept should guide your observation, analysis, and description processes. Ensure that the concept is explicitly addressed in your output, demonstrating how it is manifested within the image. If the concept is thematic, discuss how the image's elements contribute to this theme. If it is concrete, identify and describe its presence and significance in the scene. Do not mention the term "concept focus", simply discuss it directly.

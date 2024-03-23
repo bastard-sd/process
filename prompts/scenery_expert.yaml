@@ -20,5 +20,5 @@ expert_conversation_prompt: |
   "Convey the essence of the artwork's background, detailing the scene and atmosphere comprehensively in one-sentence."
 
 include_expert_context: false
-context_length: 128
-count: 4
+context_length: 64
+count: 8

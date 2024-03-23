@@ -3,6 +3,19 @@
     "port": 8080,
     "models": [
         {
+            "model": "H:/dev/llava_custom/ggml-model-f16.gguf",
+            "clip_model_path":"H:/dev/llava_custom/mmproj-model-f16-q6_k.gguf",
+            "model_alias": "llava_7b_custom",
+            "chat_format": "llava-1-5",
+            "seed":-1,
+            "n_gpu_layers": -1,
+            "logits_all": true,
+            "offload_kqv": true,
+            "n_threads": 12,
+            "n_batch": 512,
+            "n_ctx": 4096
+        },
+        {
             "model": "H:/dev/llava-v1.6-13b_gguf/vicuna-13b-q5_k.gguf",
             "clip_model_path":"H:/dev/llava-v1.6-13b_gguf/mmproj-vicuna13b-f16-q6_k.gguf",
             "model_alias": "llava_13b",
@@ -47,19 +60,6 @@
             "lora_path":"H:/dev/crestfallen_peft/ggml-adapter-model.bin",
             "lora_base":"H:/dev/llava-v1.6-mistral-7b/ggml-model-f16.gguf",
             "model_alias": "llava_13b_lora",
-            "chat_format": "llava-1-5",
-            "seed":-1,
-            "n_gpu_layers": -1,
-            "logits_all": true,
-            "offload_kqv": true,
-            "n_threads": 12,
-            "n_batch": 512,
-            "n_ctx": 4096
-        },
-        {
-            "model": "H:/dev/llava_custom/ggml-model-f16.gguf",
-            "clip_model_path":"H:/dev/llava_custom/mmproj-model-f16-q6_k.gguf",
-            "model_alias": "llava_7b_custom",
             "chat_format": "llava-1-5",
             "seed":-1,
             "n_gpu_layers": -1,
