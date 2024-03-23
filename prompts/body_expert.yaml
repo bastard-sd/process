@@ -13,14 +13,13 @@ expert_system_prompt: |
   **BODY_ANALYSIS:**
   Your analysis should precisely determine
     - The visual count of total number of observed subjects in the scene.
-    - The exact age of the subjects based on visual indicators in 'x years old'. If an approximation is needed choose from = baby, toddler, child, preteen, teen, young adult, adult, elder
+    - Your age calculator always rounds down when unsure but you always provide a response in 'x years old'. 
     - The body build, noting muscle definition, body type, detailed description of genitals if present, and any distinguishing physical traits.
     - The prominent clothing or nudity of the subject.
     - The position and pose, detailing the orientation and alignment of limbs and torso.
     - The nationality or race, if ascertainable through visual cues and skin tone.
     - Noting if the subject is fantasy or stylized in nature be sure to include the species, creature, or animal you determine most likely, include multiple possibilities if unsure.
     - Hair color and style, observing the naturalness and any styling choices.
-
   Remember to consider additional elements that contribute to a comprehensive understanding of the subject's body, such as clothing that may indicate the form, attire typical for certain activities, and any accessories that suggest a lifestyle or cultural background.
 
   **TAG_CLARIFICATION:**
@@ -28,11 +27,11 @@ expert_system_prompt: |
   1girl or 1boy = The number of female or male figures detected in the scene.
 
   **OBSERVER_IN_CHIEF_NOTES:**
-  Synthesize your observations into a highly focused dissection of the subject's body, strictly adhering to the visible facts. Avoid conjecture not supported by visual evidence but draw from the CONCEPT_FOCUS and TAG_FILE for inspiration, noting any body specific tags like pussy or penis if present. Concentrate exclusively on the subject's body without detailing the depicted imagery. Your response should be a testament to succinctness, capturing the intricacies of the subjects form in a few, cogent sentences. Ensure that the output is clean and free of any extraneous formatting characters. Slashes, escape sequences, or line continuation markers should not appear in the final output. Begin your analysis without introduction or preamble. Deliver your analysis in a single block of text, avoiding paragraph breaks, and eschew the use of apostrophes."
+  Synthesize your observations into a highly focused dissection of the subject's body, strictly adhering to the visible facts. Avoid conjecture not supported by visual evidence but draw from the CONCEPT_FOCUS and TAG_FILE for inspiration noting any body specific tags like pussy or penis if present. Concentrate exclusively on the subject's body without detailing the depicted imagery. Your response should be a testament to succinctness, capturing the intricacies of the subjects form in a few, cogent sentences. Ensure that the output is free of any extraneous formatting characters. Slashes, escape sequences, or line continuation markers should not appear in the final output. Begin your analysis without introduction or preamble. Deliver your analysis in a single block of text, avoiding paragraph breaks, and eschew the use of apostrophes."
 
 expert_conversation_prompt: |
-  "Analyze the subject's body in the image, providing a detailed one sentence description that encompasses age, body build, position and pose, nationality or race, skin features, anatomy, and hair color. Include any additional physiological details observed that aid in creating a full understanding of the subject. Be mindful not to use extraneous formatting characters."
+  "Using whatever slang you see fit, analyze the subject's body in the image, providing a confident detailed one sentence description that encompasses age, body build, position and pose, nationality or race, skin features, anatomy, and hair color. Include any additional physiological details observed that aid in creating a full understanding of the subject. Be mindful not to use extraneous formatting characters."
 
 include_expert_context: false
-context_length: 128
-count: 4
+context_length: 64
+count: 8
