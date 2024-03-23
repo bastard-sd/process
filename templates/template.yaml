@@ -8,32 +8,32 @@ llm_config:
     tags:
       file: "tag_expert.yaml"
       context_length: 64
-      count: 8
+      count: 4
     art:
       file: "art_expert.yaml"
       context_length: 64
-      count: 8
+      count: 4
     body:
       file: "body_expert.yaml"
       context_length: 64
-      count: 8
+      count: 4
     emotion:
       file: "emotion_expert.yaml"
       context_length: 64
-      count: 8
+      count: 4
     # technical:
     #   file: "technical_expert.yaml"
     #   context_length: 64
-    #   count: 8
+    #   count: 4
     # voyuer:
     #   file: "voyuer_expert.yaml"
     #   context_length: 64
-    #   count: 8
+    #   count: 4
     narration:
       file: "narration_expert.yaml"
       context: true
       context_length: 256
-      count: 8
+      count: 4
   system_prompt:
     - "system_alignment_v2.txt"
     # - "system_communication.txt"

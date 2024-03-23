@@ -40,6 +40,8 @@ python .\tag_images_step_2.py --image_directory=\path\to\images
 ```
 
 ```
+CMAKE_ARGS="-DLLAMA_CUBLAS=on" FORCE_CMAKE=1 pip install --upgrade --force-reinstall llama-cpp-python --no-cache-dir
+
 python -m llama_cpp.server --config_file ./llm_api/server.json
 ```
 

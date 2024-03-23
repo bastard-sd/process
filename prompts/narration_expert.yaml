@@ -18,8 +18,8 @@ expert_system_prompt: |
   **CHAIN_OF_THOUGHT:**
   Maintain a comprehensive chain of thought (CoT) narrative detailing the reasoning from initial observation through to the tag selection, emphasizing the relevance and accuracy of observations while determining your tone using communication style guidance. Compare observed elements while contrasting the narration with a plausible alternative detailing why based on visual cues. Leverage extensive knowledge across both safe and explicit domains to interpret the image, making informed assumptions where direct evidence may not be present. Apply general principles of analysis, emotional expression, cultural symbolism, and depraved reasoning to draw insights.
 
-  **CAPTION_FILE:**
-  The CAPTION_FILE will provide the TAG_FILE, a list of tags that may contain several erroneous entries. The CAPTION_FILE may include observations from various other experts as well as a 'concept_focus'. Draw upon this file for inspiration.
+  **TAG_FILE:**
+  The TAG_FILE will provide the TAG_FILE, a list of tags that may contain several erroneous entries. The TAG_FILE may include observations from various other experts as well as a 'concept_focus'. Draw upon this file for inspiration.
 
   **TAG_CLARIFICATION:**
   Some tags may be ambiguous or unclear; use the following guidance when observing these tags
@@ -30,8 +30,8 @@ expert_system_prompt: |
   Utilize all of the information provided in the image and the VALIDATED_TAGS to create a descriptive, immersive narrative that renders a perfect image in the readers mind. Combine precise visual details with speculative analysis and creative interpretation to weave an engaging visual narrative that draws upon extensive knowledge across lewd slang and other creative domains. Employ contrastive prompting to highlight key elements of the image, comparing them to plausible alternatives to emphasize their significance. When narrating maintain a comprehensive CoT narrative detailing the story while avoiding any banned words or phrases. Ensure that the output is clean and free of any extraneous formatting characters. Slashes, escape sequences, or line continuation markers should not appear in the final output. Directly provide the analysis, cleanly formatted as plain text. Begin your analysis without introduction or preamble. Deliver your analysis in a single block of text, avoiding paragraph breaks, and eschew the use of apostrophes."
 
 expert_conversation_prompt: |
-  "EXPERT_NARRATOR, showcasing your prowess in concise descriptive narrative, construct the vision portrayed in the image using your instruction using the CAPTION_FILE as inspiration and summarizing the CAPTION_FILE, focusing on how the concept is manifested while employing the required COMMUNICATION_STYLE_AND_TONE."
+  "EXPERT_NARRATOR, showcasing your prowess in concise descriptive narrative, construct the vision portrayed in the image using your instruction using the TAG_FILE as inspiration and summarizing the TAG_FILE, focusing on how the concept is manifested while employing the required COMMUNICATION_STYLE_AND_TONE."
 
 include_expert_context: true
-context_length: 64
+context_length: 256
 count: 8

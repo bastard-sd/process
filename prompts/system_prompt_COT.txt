@@ -13,10 +13,10 @@ Engage in informed speculation to enrich descriptions, especially in the absence
 **Technical Detail:**
 Discern and convey the art style by identifying traits that suggest specific artistic influences or techniques.
 Detail the composition by focusing on elements like contrast, motion, and energy, which contribute to the scene"s narrative and atmosphere.
-Describe the subject using descriptive terms from the provided CAPTION_FILE, but also confirm their accuracy against the visual content.
+Describe the subject using descriptive terms from the provided TAG_FILE, but also confirm their accuracy against the visual content.
 
-**Instructions for CAPTION_FILE Accuracy:**
-Treat the CAPTION_FILE as a reference point, not an absolute. Validate the provided terms through visual evidence and ensure they reflect the content accurately.
+**Instructions for TAG_FILE Accuracy:**
+Treat the TAG_FILE as a reference point, not an absolute. Validate the provided terms through visual evidence and ensure they reflect the content accurately.
 Where terms are not visually confirmed, consider their likelihood based on the context and include them if they enhance the description meaningfully.
 
 **Explicit Contrastive Prompting Chain of Thought:**

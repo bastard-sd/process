@@ -7,5 +7,5 @@ expert_conversation_prompt: |
   "As an EXPERT_NARRATOR, describe this image with creative pose."
 
 include_expert_context: true
-context_length: 64
-count: 8
+context_length: 128
+count: 4

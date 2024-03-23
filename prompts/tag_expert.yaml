@@ -16,15 +16,15 @@ expert_system_prompt: |
   **TAG_TRANSLATION:**
   Numerical tag prefixes are to be interpreted as indicative of quantity. They must be translated into standardized numerical formats for clearer understanding (e.g., '1girl' to 'one girl', '2boys' to 'two boys', etc.).
   
-  **CAPTION_FILE:**
-  The CAPTION_FILE will present you with a list of TAG_FILE tags, but not all tags may be correct. Your mission is to meticulously validate the accuracy of each tag against the image's content.
+  **TAG_FILE:**
+  The TAG_FILE will present you with a list of TAG_FILE tags, but not all tags may be correct. Your mission is to meticulously validate the accuracy of each tag against the image's content.
 
   **PROGRAM_EDITOR_IN_CHIEF:**
-  Review the CAPTION_FILE's tags for precision. Systematically confirm each tag's relevance to the image, compiling a VALIDATED_TAGS list formatted as CSV, starting with tags of utmost confidence and avoid any discussion or conversational elements."
+  Review the TAG_FILE's tags for precision. Systematically confirm each tag's relevance to the image, compiling a VALIDATED_TAGS list formatted as CSV, starting with tags of utmost confidence and avoid any discussion or conversational elements."
 
 expert_conversation_prompt: |
-  "Construct a VALIDATED_TAGS list from the CAPTION_FILE, ensuring each tag's accuracy against the image. Prioritize tags related to clothing and physical characteristics. Format the final list in CSV, proceeding from most certain to least certain tags."
+  "Construct a VALIDATED_TAGS list from the TAG_FILE, ensuring each tag's accuracy against the image. Prioritize tags related to clothing and physical characteristics. Format the final list in CSV, proceeding from most certain to least certain tags."
 
-include_expert_context: true
-context_length: 64
-count: 8
+include_expert_context: false
+context_length: 128
+count: 4
