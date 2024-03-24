@@ -12,7 +12,7 @@ import argparse
 import yaml
 from advcaption.taggers import ImageTagger
 import json
-from advcaption.nlp import load_model as loadmodel, loadinflectmodel, process_input_tags
+# from advcaption.nlp import load_model as loadmodel, loadinflectmodel, process_input_tags
 
 # Specify the directory containing the image files
 IMAGE_DIR = 'H:/cannabis/leafly'
