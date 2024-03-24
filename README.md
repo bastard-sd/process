@@ -41,14 +41,16 @@ python .\tag_images_step_2.py --image_directory=\path\to\images
 
 Tag Server
 ```
-python .\wd14_tagger_api\server.py > ./logs/server.log
+python .\wd14_tagger_api\server.py > .\logs\server.log
+python .\0_tag_folder.py --image_directory=".\test_image_dir" --error_directory=./test_image_error --overwrite --rename --beast
 ```
 
 LLM Server
 ```
 CMAKE_ARGS="-DLLAMA_CUBLAS=on" FORCE_CMAKE=1 pip install --upgrade --force-reinstall llama-cpp-python --no-cache-dir
 
-python -m llama_cpp.server --config_file ./llm_api/server.json
+python -m llama_cpp.server --config_file=.\llm_api\server.json
+python .\1_caption_folder.py --image_directory=.\test_image_poke --default_template=.\templates\template.yaml --overwrite --skipconcept
 ```
 
 # Troubleshooting
@@ -57,4 +59,11 @@ Do the following
 ```
 pip uninstall onnxruntime onnxruntime-gpu
 pip install onnxruntime onnxruntime-gpu
+```
+
+# Activate `venv`
+```
+source ./venv/Scripts/activate
+source ./venv/bin/activate
+./venv/Scripts/activate.bin/.ps1
 ```

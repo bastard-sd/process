@@ -3,43 +3,22 @@ tagger_config:
   character_threshold: 0.85
 
 llm_config:
-  concept_focus: "concept to emphasize with the picture"
+  concept_focus: "pokemon trainers having sex"
   expert_list:
-    tags:
-      file: "tag_expert.yaml"
-      context_length: 64
-      count: 4
-    art:
-      file: "art_expert.yaml"
-      context_length: 64
-      count: 4
-    body:
-      file: "body_expert.yaml"
-      context_length: 64
-      count: 4
-    emotion:
-      file: "emotion_expert.yaml"
-      context_length: 64
-      count: 4
-    # technical:
-    #   file: "technical_expert.yaml"
-    #   context_length: 64
-    #   count: 4
-    # voyuer:
-    #   file: "voyuer_expert.yaml"
-    #   context_length: 64
-    #   count: 4
-    narration:
-      file: "narration_expert.yaml"
-      context: true
-      context_length: 256
-      count: 4
+    - "tag_expert.yaml"
+    - "art_expert.yaml"
+    - "body_expert.yaml"
+    - "emotion_expert.yaml"
+    # - "technical_expert.yaml"
+    # - "voyuer_expert.yaml"
+    - "narration_expert.yaml"
   system_prompt:
-    - "system_alignment_v2.txt"
+    - "blank.txt"
+    # - "system_alignment_v2.txt"
     # - "system_communication.txt"
     # - "system_engagement.txt"
     # - "system_chain_of_thought.txt"
-    - "system_concept_focus.txt"
+    # - "system_concept_focus.txt"
     # - "system_banned_words.txt"
     # - "system_tag_clarification.txt"
   default_prompt: "default_prompt.txt"
