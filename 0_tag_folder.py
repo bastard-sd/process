@@ -197,11 +197,6 @@ if __name__ == "__main__":
     else:
         config = copy_template_to_image_directory(args.image_directory)
 
-    processor = ImageTagger(model=args.model, tag_threshold=args.threshold, ratio_threshold=args.threshold, character_threshold=0.85)
-
-    # spacy_model = loadmodel("en_core_web_lg", 'cuda:0')
-    # inflect_model = loadinflectmodel()
-
     for filename in renamed_filelist:
         print(filename)
 
@@ -215,20 +210,6 @@ if __name__ == "__main__":
         if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.bmp', '.gif', '.tiff', '.webp', '.webm')):
             try:
                 send_image_and_save_response(filename, API_ENDPOINT)
-                # combined_results = processor.process_image(filename, args.beast)
-                # # try:
-                # #     fully_processed_prompt = process_input_tags(spacy_model, inflect_model, [], combined_results['general'])
-                # #     combined_results['processed'] = fully_processed_prompt
-                # # except Exception as e:
-                # #     print(f"Error processing tags for {filename}: {e}. Skipping this step.")
-                # #     print(f"Moving {filename} to error directory.")
-                # #     shutil.move(image_path, os.path.join(args.error_directory, os.path.basename(filename)))
-                # #     # Optionally, you can decide to continue, break, or take any specific action here
-                # #     continue  # or use 'break' to stop the loop, or 'pass' to do nothing further
-                
-                # # Assuming success, proceed to save the combined_results to a YAML file
-                # with open(yaml_path, 'w') as yaml_file:
-                #     yaml.dump(combined_results, yaml_file, allow_unicode=True, default_flow_style=False, indent=4)
                 print(f"Saved combined results to {yaml_path}.")
             except Exception as e:  # Catching a general exception to handle any kind of failure in process_image
                 print(f"Failed to process image {filename}. Error: {e}")
