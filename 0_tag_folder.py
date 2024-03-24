@@ -142,6 +142,7 @@ def generate_unique_id(length=8):
 
 
 def send_image_and_save_response(image_path: Path, url: str):
+    image_path = Path(image_path)
     yaml_path = image_path.with_suffix('.yaml')
     if yaml_path.exists():
         print(f"{yaml_path.name} already exists. Skipping reprocessing.")
@@ -209,7 +210,16 @@ if __name__ == "__main__":
         # Proceed with processing the image if no YAML file exists
         if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.bmp', '.gif', '.tiff', '.webp', '.webm')):
             try:
+                full_path = Path(IMAGE_DIR) / item
                 send_image_and_save_response(filename, API_ENDPOINT)
                 print(f"Saved combined results to {yaml_path}.")
             except Exception as e:  # Catching a general exception to handle any kind of failure in process_image
                 print(f"Failed to process image {filename}. Error: {e}")
+        
+    # Iterate through all files in the directory
+    for item in os.listdir(IMAGE_DIR):
+        full_path = Path(IMAGE_DIR) / item
+        # Check if the current item is a file and has an image extension
+        if full_path.is_file() and full_path.suffix.lower() in ['.jpg', '.jpeg', '.png']:
+            print(f"Processing {full_path.name}")
+            send_image_and_save_response(full_path, API_ENDPOINT)
