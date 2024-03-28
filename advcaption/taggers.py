@@ -37,7 +37,8 @@ class ImageTagger:
         self.ratio_threshold = ratio_threshold
         self.character_threshold = character_threshold
         self.models = {
-            model: None
+            'conv': None,
+            'z3d': None
         }
         self.load_all_tagger_models()
 
